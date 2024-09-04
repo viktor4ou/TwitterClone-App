@@ -10,7 +10,7 @@ namespace TwitterClone_App
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
-
+            //Test
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
