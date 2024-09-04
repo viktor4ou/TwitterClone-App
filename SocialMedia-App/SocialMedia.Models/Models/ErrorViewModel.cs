@@ -1,4 +1,4 @@
-namespace SocialMedia_App.Models
+namespace SocialMedia.Models.Models
 {
     public class ErrorViewModel
     {

@@ -7,4 +7,10 @@
     <RootNamespace>SocialMedia_App</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SocialMedia-Data\SocialMedia.Data.csproj" />
+    <ProjectReference Include="..\SocialMedia.Models\SocialMedia.Models.csproj" />
+    <ProjectReference Include="..\SocialMedia.Utility\SocialMedia.Utility.csproj" />
+  </ItemGroup>
+
 </Project>

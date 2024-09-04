@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia_App.Models;
 using System.Diagnostics;
+using SocialMedia.Models.Models;
 
 namespace SocialMedia_App.Controllers
 {

@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SocialMedia-App\SocialMedia-App.csproj" />
-    <ProjectReference Include="..\SocialMedia-Data\SocialMedia.Data.csproj" />
-    <ProjectReference Include="..\SocialMedia.Utility\SocialMedia.Utility.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
     <Folder Include="Interfaces\" />
   </ItemGroup>
 
