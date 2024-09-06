@@ -19,7 +19,7 @@ namespace SocialMedia_App.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(Post post)
+        public IActionResult Index(Post post)// TODO: rename to CreatePost ,add image functionality 
         {
             post.DatePosted = DateTime.Now;
             db.Posts.Add(post);
