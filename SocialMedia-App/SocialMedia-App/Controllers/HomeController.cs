@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using SocialMedia.Data.Data;
 using SocialMedia.Models.Models;
 
 namespace SocialMedia_App.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ApplicationDbContext db;
+        public HomeController(ApplicationDbContext db)
         {
-            _logger = logger;
+            this.db = db;
         }
 
         public IActionResult Index()
@@ -18,6 +18,14 @@ namespace SocialMedia_App.Controllers
             return View();
         }
 
+        [HttpPost]
+        public IActionResult Index(Post post)
+        {
+            post.DatePosted = DateTime.Now;
+            db.Posts.Add(post);
+            db.SaveChanges();
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();
