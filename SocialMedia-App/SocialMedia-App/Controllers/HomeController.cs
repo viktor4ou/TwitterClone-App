@@ -2,60 +2,29 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using SocialMedia.Data.Data;
 using SocialMedia.Models.Models;
-using Microsoft.AspNetCore.Hosting;
-using SocialMedia.Models.ViewModels;
 
 namespace SocialMedia_App.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;
-        private readonly IWebHostEnvironment webHostEnvironment;
-
-        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        public HomeController(ApplicationDbContext db)
         {
-
             this.db = db;
-            this.webHostEnvironment = webHostEnvironment;
         }
 
-        
         public IActionResult Index()
         {
-            var viewModel = new PostViewModel
-            {
-                Post = new Post(),
-                Posts = db.Posts.ToList()
-            };
-            return View(viewModel);
+            return View();
         }
+
         [HttpPost]
-        public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
+        public IActionResult Index(Post post)// TODO: rename to CreatePost ,add image functionality 
         {
-            if (ModelState.IsValid)
-            {
-                if (file != null)
-                {
-                    string wwwRootPath = webHostEnvironment.WebRootPath;
-                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\posts");
-
-                    using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
-                    {
-                        file.CopyTo(s);
-                    }
-
-                    postVM.Post.ImageURL = @"\images\posts\" + filename;
-                }
-
-                postVM.Post.DatePosted = DateTime.Now;
-                db.Posts.Add(postVM.Post);
-                db.SaveChanges();
-                return RedirectToAction(nameof(Index));
-            }
-
-            postVM.Posts = db.Posts.ToList();
-            return View(postVM);
+            post.DatePosted = DateTime.Now;
+            db.Posts.Add(post);
+            db.SaveChanges();
+            return View();
         }
         public IActionResult Privacy()
         {
