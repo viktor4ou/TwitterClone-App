@@ -1,22 +1,91 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+body {
+    background-color: #f0f2f5;
+}
+
+.post-card {
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+.post-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e4e6eb;
+}
+
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    background-color: #1877f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.post-content {
+    padding: 16px;
+    font-size: 1.1rem;
+}
+
+.post-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #e4e6eb;
+}
+
+.btn-like, .btn-comment {
+    color: #65676b;
+    font-weight: 600;
+    background: none;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.btn-like:hover, .btn-comment:hover {
+    background-color: #f2f3f5;
+    border-radius: 4px;
+}
+
+.post-date {
+    color: #65676b;
+    font-size: 0.9rem;
+}
+
+.main-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #333;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.title-underline {
+    width: 150px;
+    height: 4px;
+    background-color: #007bff;
+    margin: 20px auto;
 }
