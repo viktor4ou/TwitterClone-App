@@ -51,7 +51,7 @@ namespace SocialMedia_App.Controllers
                 postVM.Post.DatePosted = DateTime.Now;
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
 
             postVM.Posts = db.Posts.ToList();
