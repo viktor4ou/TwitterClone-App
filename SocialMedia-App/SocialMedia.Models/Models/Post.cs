@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,7 +16,9 @@ namespace SocialMedia.Models.Models
         [Required]
         public string Content { get; set; }
         public string? ImageURL { get; set; }
+        [ValidateNever]
         public int Likes { get; set; }
+        [ValidateNever]
         public DateTime DatePosted { get; set; }
     }
 }
