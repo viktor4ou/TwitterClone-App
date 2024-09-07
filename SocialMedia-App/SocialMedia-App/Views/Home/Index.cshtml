@@ -51,6 +51,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- TODO: Create delete post button-->
                 <div class="post-content">
                     <p>@post.Content</p>
                     @if (!string.IsNullOrEmpty(post.ImageURL))
@@ -62,8 +63,9 @@
                     <div>
                         @post.Likes
                         <button class="btn-like me-3">
-                            <i class="bi bi-hand-thumbs-up me-2"></i>Like
-                        </button>
+                            <i class="bi bi-hand-thumbs-up me-2"></i>Like 
+                            <!-- TODO: Create post request and handle it in the controller-->
+                            </button>ssaa
                         <button class="btn-comment">
                             <i class="bi bi-chat me-2"></i>Comment
                         </button>
