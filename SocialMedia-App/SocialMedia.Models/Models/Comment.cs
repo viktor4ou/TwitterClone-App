@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -9,10 +10,14 @@ namespace SocialMedia.Models.Models
 {
     public class Comment
     {
-        [ForeignKey("PostId")]
-        public int PostId { get; set; }
+        [Key]
         public int CommentId { get; set; }
         public string Content { get; set; }
-        public DateTime DatePosted { get; set; }    
+        public DateTime DatePosted { get; set; }
+        
+        public int Id { get; set; }
+
+        [ForeignKey("Id")]
+        public Post Post { get; set; }
     }
 }
