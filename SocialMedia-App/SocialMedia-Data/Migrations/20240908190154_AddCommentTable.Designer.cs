@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908190154_AddCommentTable")]
+    partial class AddCommentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,29 +40,29 @@ namespace SocialMedia.Data.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.HasKey("CommentId");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("PostId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
 
                     b.HasData(
                         new
                         {
                             CommentId = 1,
                             Content = "This is the content of the first comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6807),
-                            Id = 1
+                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9798),
+                            PostId = 1
                         },
                         new
                         {
                             CommentId = 2,
                             Content = "This is the content of the second comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6810),
-                            Id = 2
+                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9801),
+                            PostId = 2
                         });
                 });
 
@@ -86,21 +89,21 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Content = "This is the content of the first post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6691),
+                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9663),
                             Likes = 0
                         },
                         new
                         {
                             Id = 2,
                             Content = "This is the content of the second post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6737),
+                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9716),
                             Likes = 0
                         });
                 });
@@ -109,7 +112,7 @@ namespace SocialMedia.Data.Migrations
                 {
                     b.HasOne("SocialMedia.Models.Models.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("Id")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
