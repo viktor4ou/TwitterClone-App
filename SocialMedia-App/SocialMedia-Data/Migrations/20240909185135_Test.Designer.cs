@@ -12,8 +12,8 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240908190154_AddCommentTable")]
-    partial class AddCommentTable
+    [Migration("20240909185135_Test")]
+    partial class Test
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,17 +52,17 @@ namespace SocialMedia.Data.Migrations
                     b.HasData(
                         new
                         {
-                            CommentId = 1,
+                            CommentId = 6,
                             Content = "This is the content of the first comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9798),
-                            PostId = 1
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5579),
+                            PostId = 6
                         },
                         new
                         {
-                            CommentId = 2,
+                            CommentId = 7,
                             Content = "This is the content of the second comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9801),
-                            PostId = 2
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5583),
+                            PostId = 7
                         });
                 });
 
@@ -96,14 +96,14 @@ namespace SocialMedia.Data.Migrations
                         {
                             Id = 1,
                             Content = "This is the content of the first post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9663),
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5366),
                             Likes = 0
                         },
                         new
                         {
                             Id = 2,
                             Content = "This is the content of the second post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 1, 53, 723, DateTimeKind.Local).AddTicks(9716),
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5432),
                             Likes = 0
                         });
                 });

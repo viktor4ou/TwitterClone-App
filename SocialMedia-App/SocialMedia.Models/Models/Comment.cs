@@ -15,9 +15,9 @@ namespace SocialMedia.Models.Models
         public string Content { get; set; }
         public DateTime DatePosted { get; set; }
         
-        public int Id { get; set; }
+        public int PostId { get; set; }
 
-        [ForeignKey("Id")]
+        [ForeignKey("PostId")]
         public Post Post { get; set; }
     }
 }

@@ -37,29 +37,29 @@ namespace SocialMedia.Data.Migrations
                     b.Property<DateTime>("DatePosted")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
                     b.HasKey("CommentId");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("PostId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
 
                     b.HasData(
                         new
                         {
-                            CommentId = 1,
+                            CommentId = 6,
                             Content = "This is the content of the first comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6807),
-                            Id = 1
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5579),
+                            PostId = 6
                         },
                         new
                         {
-                            CommentId = 2,
+                            CommentId = 7,
                             Content = "This is the content of the second comment",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6810),
-                            Id = 2
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5583),
+                            PostId = 7
                         });
                 });
 
@@ -86,21 +86,21 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             Content = "This is the content of the first post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6691),
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5366),
                             Likes = 0
                         },
                         new
                         {
                             Id = 2,
                             Content = "This is the content of the second post",
-                            DatePosted = new DateTime(2024, 9, 8, 22, 16, 29, 112, DateTimeKind.Local).AddTicks(6737),
+                            DatePosted = new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5432),
                             Likes = 0
                         });
                 });
@@ -109,7 +109,7 @@ namespace SocialMedia.Data.Migrations
                 {
                     b.HasOne("SocialMedia.Models.Models.Post", "Post")
                         .WithMany()
-                        .HasForeignKey("Id")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
