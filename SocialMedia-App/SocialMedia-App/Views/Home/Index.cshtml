@@ -1,5 +1,5 @@
 ﻿@model SocialMedia.Models.ViewModels.PostViewModel
-<!-- Modal -->
+<!-- Create Post Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -62,17 +62,35 @@
                 <div class="post-footer d-flex justify-content-between align-items-center">
                     <div>
                         @post.Likes
-                        <button class="btn-like me-3">
-                            <i class="bi bi-hand-thumbs-up me-2"></i>Like 
+                        <button class="btn btn-like me-3">
+                            <i class="bi bi-hand-thumbs-up me-2"></i>Like
                             <!-- TODO: Create post request and handle it in the controller-->
-                            </button>ssaa
-                        <button class="btn-comment">
-                            <i class="bi bi-chat me-2"></i>Comment
                         </button>
+                        <form method="post" action="/Home/CreateComment" class="d-inline">
+                            <!--Returns the postId to the controller-->
+                            <input type="hidden" name="postId" value="@post.Id" />
+                            <div class="mb-3">
+                                <label asp-for="@Model.Comment.Content">Description</label>
+                                <input asp-for="@Model.Comment.Content" type="text" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreateComment">
+                                <i class="bi bi-highlighter">
+                                </i> Comment
+                            </button>
+                        </form>
+                        @if (@Model.Comments.Exists(i => i.PostId == @post.Id))
+                        {
+                            @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.Id))
+                            {
+                                <h6 class="mb-0">@comment.Content</h6>
+                            }
+                        }
                     </div>
                     <span class="post-date">@post.DatePosted.ToString("M/dd/yyyy")</span>
                 </div>
             </div>
         </div>
     }
+
+
 </div>
