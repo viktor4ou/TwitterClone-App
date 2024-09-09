@@ -19,19 +19,22 @@ namespace SocialMedia_App.Controllers
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        
+
         public IActionResult Index()
         {
             var viewModel = new PostViewModel
             {
                 Post = new Post(),
-                Posts = db.Posts.ToList()
+                Posts = db.Posts.ToList(),
+                Comment = new Comment(),
+                Comments = db.Comments.ToList()
             };
             return View(viewModel);
         }
         [HttpPost]
         public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
+            //For some reason the comment needs to be valid 
             if (ModelState.IsValid)
             {
                 if (file != null)
@@ -51,12 +54,19 @@ namespace SocialMedia_App.Controllers
                 postVM.Post.DatePosted = DateTime.Now;
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
-                return RedirectToAction("Index");
             }
-
-            postVM.Posts = db.Posts.ToList();
-            return View(postVM);
+            return RedirectToAction("Index");
         }
+        [HttpPost]
+        public IActionResult CreateComment(int postId, PostViewModel postVM)
+        {
+            postVM.Comment.PostId = postId;
+            db.Comments.Add(postVM.Comment);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+            //How to make it to just load the comment without refreshing the page like in a real time chat
+        }
+
         public IActionResult Privacy()
         {
             return View();
