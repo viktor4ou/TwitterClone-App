@@ -63,7 +63,15 @@ namespace SocialMedia_App.Controllers
             //How to make it to just load the comment without refreshing the page like in a real time chat
         }
 
-
+        public IActionResult DeletePost(int id)
+        {
+            Post searchedPost = db.Posts.Find(id);
+            List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
+            db.Posts.Remove(searchedPost);
+            db.Comments.RemoveRange(postComments);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
         public IActionResult DeleteComment(int id)  
         {
             Comment searchedComment = db.Comments.Find(id);
