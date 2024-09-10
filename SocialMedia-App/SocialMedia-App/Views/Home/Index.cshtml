@@ -1,10 +1,10 @@
 ﻿@model SocialMedia.Models.ViewModels.PostViewModel
-<!-- Modal -->
+<!-- Create Post Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Create Post</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -50,6 +50,8 @@
                             <small class="text-muted">@post.DatePosted.ToString("H:mm tt")</small>
                         </div>
                     </div>
+                    <!--Move this under on the bottom of content tab-->
+                        <div class="post-date d-flex justify-content-end">@post.DatePosted.ToString("M/dd/yyyy")</div>
                 </div>
                 <!-- TODO: Create delete post button-->
                 <div class="post-content">
@@ -60,19 +62,61 @@
                     }
                 </div>
                 <div class="post-footer d-flex justify-content-between align-items-center">
-                    <div>
+                    <div class="container">
                         @post.Likes
-                        <button class="btn-like me-3">
-                            <i class="bi bi-hand-thumbs-up me-2"></i>Like 
+                        <button class="btn btn-like me-3">
+                            <i class="bi bi-hand-thumbs-up me-2"></i>Like
                             <!-- TODO: Create post request and handle it in the controller-->
-                            </button>ssaa
-                        <button class="btn-comment">
-                            <i class="bi bi-chat me-2"></i>Comment
                         </button>
+                        <button class="btn  text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.Id" aria-expanded="false" aria-controls="commentForm-@post.Id">
+                            <i class="bi bi-chat"></i> Comment
+                        </button>
+                        <div class="collapse" id="commentForm-@post.Id">
+                            <form method="post" action="/Home/CreateComment" class="mt-2">
+                                <!--Returns the postId to the controller-->
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <div class="input-group mb-3">
+                                    <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
+                                    <button class="btn btn-outline-info text-dark" type="submit"><i class="bi bi-send"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        @if (@Model.Comments.Exists(i => i.PostId == @post.Id))
+                        {
+                            @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.Id))
+                            {
+                                <div class="container mt-1">
+                                    <div class="row border p-2">
+                                        <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-primary me-2 flex-shrink-0" style="width: 40px; height: 40px;"></div>
+                                                <span class="content-wrapper ">Author Name</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
+                                            @comment.Content
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-center justify-content-md-end">
+                                            <div class="dropdown me-2">
+                                                <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="bi bi-three-dots"></i>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                    <li><a class="dropdown-item" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
+                                                    <li><a class="dropdown-item" href="#">Edit</a></li>
+                                                </ul>
+                                            </div>
+                                            <span class="text-nowrap">@comment.DatePosted</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
-                    <span class="post-date">@post.DatePosted.ToString("M/dd/yyyy")</span>
                 </div>
             </div>
         </div>
     }
+
+
 </div>
