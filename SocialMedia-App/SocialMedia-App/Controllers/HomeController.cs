@@ -22,15 +22,10 @@ namespace SocialMedia_App.Controllers
 
         public IActionResult Index()
         {
-            var viewModel = new PostViewModel
-            {
-                Post = new Post(),
-                Posts = db.Posts.ToList(),
-                Comment = new Comment(),
-                Comments = db.Comments.ToList()
-            };
+            PostViewModel viewModel = GetViewModel();
             return View(viewModel);
         }
+
         [HttpPost]
         public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
@@ -85,6 +80,41 @@ namespace SocialMedia_App.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        private PostViewModel GetViewModel()
+        {
+            var viewModel = new PostViewModel
+            {
+                Post = new Post(),
+                Posts = db.Posts.ToList(),
+                Comment = new Comment(),
+                Comments = db.Comments.ToList()
+            };
+            foreach (var post in viewModel.Posts)
+            {
+                post.TimeAgo = TimeAgo(post.DatePosted);
+            }
+            foreach (var comment in viewModel.Comments)
+            {
+                comment.TimeAgo = TimeAgo(comment.DatePosted);
+            }
+
+            return viewModel;
+        }
+        private string TimeAgo(DateTime postedDate)
+        {
+            var timeSpan = DateTime.Now - postedDate;
+
+            return timeSpan switch
+            {
+                _ when timeSpan <= TimeSpan.FromSeconds(60) => "Just now",
+                _ when timeSpan <= TimeSpan.FromMinutes(60) => $"{timeSpan.Minutes} minutes ago",
+                _ when timeSpan <= TimeSpan.FromHours(24) => $"{timeSpan.Hours} hours ago",
+                _ when timeSpan <= TimeSpan.FromDays(7) => $"{timeSpan.Days} days ago",
+                _ when timeSpan <= TimeSpan.FromDays(30) => $"{timeSpan.Days / 7} weeks ago",
+                _ => postedDate.ToString("MMMM dd, yyyy")
+            };
         }
     }
 }

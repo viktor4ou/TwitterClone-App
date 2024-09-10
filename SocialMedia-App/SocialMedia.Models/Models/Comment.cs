@@ -22,5 +22,9 @@ namespace SocialMedia.Models.Models
         [ForeignKey("PostId")]
         [ValidateNever]
         public Post Post { get; set; }
+
+        [NotMapped]
+        [ValidateNever]
+        public string TimeAgo { get; set; }
     }
 }
