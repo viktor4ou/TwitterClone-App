@@ -22,19 +22,10 @@ namespace SocialMedia_App.Controllers
 
         public IActionResult Index()
         {
-            var viewModel = new PostViewModel
-            {
-                Post = new Post(),
-                Posts = db.Posts.ToList(),
-                Comment = new Comment(),
-                Comments = db.Comments.ToList()
-            };
-            foreach (var post in viewModel.Posts)
-            {
-                post.TimeAgo = TimeAgo(post.DatePosted);
-            }
+            PostViewModel viewModel = GetViewModel();
             return View(viewModel);
         }
+
         [HttpPost]
         public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
@@ -89,6 +80,27 @@ namespace SocialMedia_App.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        
+        private PostViewModel GetViewModel()
+        {
+            var viewModel = new PostViewModel
+            {
+                Post = new Post(),
+                Posts = db.Posts.ToList(),
+                Comment = new Comment(),
+                Comments = db.Comments.ToList()
+            };
+            foreach (var post in viewModel.Posts)
+            {
+                post.TimeAgo = TimeAgo(post.DatePosted);
+            }
+            foreach (var comment in viewModel.Comments)
+            {
+                comment.TimeAgo = TimeAgo(comment.DatePosted);
+            }
+
+            return viewModel;
         }
         private string TimeAgo(DateTime postedDate)
         {
