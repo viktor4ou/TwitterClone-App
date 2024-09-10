@@ -61,6 +61,7 @@ namespace SocialMedia_App.Controllers
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
             postVM.Comment.PostId = postId;
+            postVM.Comment.DatePosted = DateTime.Now;   
             db.Comments.Add(postVM.Comment);
             db.SaveChanges();
             return RedirectToAction("Index");
