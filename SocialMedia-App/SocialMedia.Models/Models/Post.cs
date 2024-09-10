@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -20,5 +21,8 @@ namespace SocialMedia.Models.Models
         public int Likes { get; set; }
         [ValidateNever]
         public DateTime DatePosted { get; set; }
+        [NotMapped]
+        [ValidateNever]
+        public string TimeAgo { get; set; }
     }
 }
