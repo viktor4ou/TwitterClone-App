@@ -20,9 +20,17 @@
                             <h6 class="mb-0">Author name</h6>
                             <small class="text-muted">@post.TimeAgo</small>
                         </div>
+                        <div class="dropdown me-2 ms-auto">
+                            <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" asp-action="DeletePost" asp-route-id="@post.Id">Delete</a></li>
+                                <li><a class="dropdown-item" href="#">Edit</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <!--Move this under on the bottom of content tab-->
-                    <div class="post-date d-flex justify-content-end">@post.DatePosted.ToString("M/dd/yyyy")</div>
                 </div>
                 <!-- TODO: Create delete post button-->
                 <div class="post-content">
