@@ -63,6 +63,7 @@ namespace SocialMedia_App.Controllers
 
         public IActionResult DeletePost(int id)
         {
+            //TODO: delete the image related to the post
             Post searchedPost = db.Posts.Find(id);
             List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
             db.Posts.Remove(searchedPost);
