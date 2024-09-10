@@ -21,6 +21,8 @@
                             <small class="text-muted">@post.TimeAgo</small>
                         </div>
                     </div>
+                    <!--Move this under on the bottom of content tab-->
+                    <div class="post-date d-flex justify-content-end">@post.DatePosted.ToString("M/dd/yyyy")</div>
                 </div>
                 <!-- TODO: Create delete post button-->
                 <div class="post-content">
@@ -50,7 +52,7 @@
                                 </div>
                             </form>
                         </div>
-                        @if (@Model.Comments.Exists(i => i.PostId == @post.Id))
+                        @if (@Model.Comments.Any(i => i.PostId == @post.Id))
                         {
                             @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.Id))
                             {
@@ -75,7 +77,7 @@
                                                     <li><a class="dropdown-item" href="#">Edit</a></li>
                                                 </ul>
                                             </div>
-                                            <small class="text-nowrap">@comment.DatePosted</small>
+                                            <small class="text-nowrap">@comment.TimeAgo</small>
                                         </div>
                                     </div>
                                 </div>
