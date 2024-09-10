@@ -89,3 +89,8 @@ body {
     background-color: #007bff;
     margin: 20px auto;
 }
+
+.content-wrapper {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
