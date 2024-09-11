@@ -9,30 +9,33 @@
     <div class="container position-relative d-flex justify-content-end">
         <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="bi bi-highlighter"></i> Create Post</button>
     </div>
+    <!--Display all posts-->
     @foreach (var post in @Model.Posts)
     {
-        <div class="container mt-2 ">
+        <div class="container mt-2">
             <div class="post-card">
                 <div class="post-header">
                     <div class="d-flex align-items-center">
+                        <!--TODO:Change it to user info-->
                         <div class="profile-pic rounded-circle me-2">AN</div>
                         <div>
                             <h6 class="mb-0">Author name</h6>
                             <small class="text-muted">@post.TimeAgo</small>
                         </div>
                         <div class="dropdown me-2 ms-auto">
+                            <!--Button for post manipulation-->
                             <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-three-dots"></i>
                             </button>
+                            <!--Dropdown with all post manipulations-->
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <li><a class="dropdown-item" asp-action="DeletePost" asp-route-id="@post.Id">Delete</a></li>
+                                <!--TODO:Add Edit post functionality-->
                                 <li><a class="dropdown-item" href="#">Edit</a></li>
                             </ul>
                         </div>
                     </div>
-                    <!--Move this under on the bottom of content tab-->
                 </div>
-                <!-- TODO: Create delete post button-->
                 <div class="post-content">
                     <p>@post.Content</p>
                     @if (!string.IsNullOrEmpty(post.ImageURL))
@@ -40,16 +43,20 @@
                         <img src="@post.ImageURL" alt="Post Image" class="img-fluid" />
                     }
                 </div>
-                <div class="post-footer d-flex justify-content-between align-items-center">
+                <div class="post-footer">
                     <div class="container">
-                        @post.Likes
-                        <button class="btn btn-like me-3">
-                            <i class="bi bi-hand-thumbs-up me-2"></i>Like
-                            <!-- TODO: Create post request and handle it in the controller-->
-                        </button>
-                        <button class="btn  text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.Id" aria-expanded="false" aria-controls="commentForm-@post.Id">
-                            <i class="bi bi-chat"></i> Comment
-                        </button>
+                        <!--Like and comment buttons-->
+                        <div class="container">
+                            @post.Likes
+                            <button class="btn btn-like me-3">
+                                <i class="bi bi-hand-thumbs-up me-2"></i>Like
+                                <!-- TODO: Create post request and handle it in the controller-->
+                            </button>
+                            <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.Id" aria-expanded="false" aria-controls="commentForm-@post.Id">
+                                <i class="bi bi-chat"></i> Comment
+                            </button>
+                        </div>
+                        <!--Comment form-->
                         <div class="collapse" id="commentForm-@post.Id">
                             <form method="post" action="/Home/CreateComment" class="mt-2">
                                 <!--Returns the postId to the controller-->
@@ -62,30 +69,32 @@
                         </div>
                         @if (@Model.Comments.Any(i => i.PostId == @post.Id))
                         {
+                            <!--Display all comments-->
                             @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.Id))
                             {
                                 <div class="container mt-1">
-                                    <div class="row border p-2">
+                                    <div class="row rounded border p-2">
                                         <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
                                             <div class="d-flex align-items-center">
-                                                <div class="rounded-circle bg-primary me-2 flex-shrink-0" style="width: 40px; height: 40px;"></div>
-                                                <span class="content-wrapper ">Author Name</span>
+                                                <div class="profile-pic rounded-circle me-2">AN</div>
+                                                <h6 class="content-wrapper mb-0">Author Name</h6>
+                                                <!--Dropdown for comment manipulations-->
+                                                <div class="dropdown ms-auto">
+                                                    <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <!--Dropdown with comment manipulation options-->
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        <li><a class="dropdown-item" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
                                             @comment.Content
                                         </div>
                                         <div class="col-md-3 d-flex align-items-center justify-content-md-end">
-                                            <div class="dropdown me-2">
-                                                <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="bi bi-three-dots"></i>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                    <li><a class="dropdown-item" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
-                                                    <li><a class="dropdown-item" href="#">Edit</a></li>
-                                                </ul>
-                                            </div>
-                                            <small class="text-nowrap">@comment.TimeAgo</small>
+                                            <small class="text-wrap">@comment.TimeAgo</small>
                                         </div>
                                     </div>
                                 </div>
