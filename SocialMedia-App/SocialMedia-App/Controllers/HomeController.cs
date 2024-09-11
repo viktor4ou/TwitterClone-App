@@ -25,9 +25,11 @@ namespace SocialMedia_App.Controllers
             PostViewModel viewModel = GetViewModel();
             return View(viewModel);
         }
+
         [HttpPost]
-        public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)
+        public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
+            //For some reason the comment needs to be valid 
             if (ModelState.IsValid)
             {
                 if (file != null)
@@ -63,7 +65,6 @@ namespace SocialMedia_App.Controllers
 
         public IActionResult DeletePost(int id)
         {
-            //TODO: delete the image related to the post
             Post searchedPost = db.Posts.Find(id);
             List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
             db.Posts.Remove(searchedPost);
