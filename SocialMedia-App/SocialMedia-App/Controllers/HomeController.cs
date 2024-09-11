@@ -79,10 +79,6 @@ namespace SocialMedia_App.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
