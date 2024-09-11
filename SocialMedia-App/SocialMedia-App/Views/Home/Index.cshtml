@@ -107,7 +107,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" asp-action="CreatePost" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label asp-for="@Model.Post.Content">Description</label>
                         <input asp-for="@Model.Post.Content" type="text" class="form-control" />

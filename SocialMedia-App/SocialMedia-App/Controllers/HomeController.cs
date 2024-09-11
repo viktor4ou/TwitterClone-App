@@ -27,7 +27,7 @@ namespace SocialMedia_App.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
+        public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
             //For some reason the comment needs to be valid 
             if (ModelState.IsValid)
