@@ -80,6 +80,18 @@ namespace SocialMedia_App.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult EditPost(int id)   
+        {
+            PostViewModel postVM = new();
+            postVM.Post= db.Posts.FirstOrDefault(i=>i.Id == id);
+            if (postVM.Post is null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Index", postVM);
+        }
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
