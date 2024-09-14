@@ -80,6 +80,45 @@ namespace SocialMedia_App.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult EditPost(int id)
+        {
+            PostViewModel viewModel = GetViewModel();
+            viewModel.Post = db.Posts.Find(id);
+            return View(viewModel.Post);
+        }
+        [HttpPost]
+        public IActionResult EditPost(Post editedPost, IFormFile? file)   
+        {
+            if (ModelState.IsValid)
+            {
+                //Uploaded an new image
+                if (file != null)
+                {
+                    string wwwRootPath = webHostEnvironment.WebRootPath;
+                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\posts");
+                    //Delete existing image
+                    if (editedPost.ImageURL != null)
+                    {
+                        string oldImagePath = Path.Combine(wwwRootPath, editedPost.ImageURL.TrimStart('\\'));
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                    //Save new image
+                    using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
+                    {
+                        file.CopyTo(s);
+                    }
+
+                    editedPost.ImageURL = @"\images\posts\" + filename;
+                }
+
+                editedPost.DatePosted = DateTime.Now;
+                db.Posts.Update(editedPost);
+                db.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+        
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
