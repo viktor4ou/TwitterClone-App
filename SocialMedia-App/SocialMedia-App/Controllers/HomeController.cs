@@ -29,7 +29,6 @@ namespace SocialMedia_App.Controllers
         [HttpPost]
         public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
         {
-            //For some reason the comment needs to be valid 
             if (ModelState.IsValid)
             {
                 if (file != null)
@@ -49,8 +48,10 @@ namespace SocialMedia_App.Controllers
                 postVM.Post.DatePosted = DateTime.Now;
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            ViewData["ShowModal"] = true;
+            return View("Index", postVM);
         }
         [HttpPost]
         public IActionResult CreateComment(int postId, PostViewModel postVM)
@@ -122,8 +123,9 @@ namespace SocialMedia_App.Controllers
                 editedPost.DatePosted = DateTime.Now;
                 db.Posts.Update(editedPost);
                 db.SaveChanges();
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
+            return View("EditPost", editedPost);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
