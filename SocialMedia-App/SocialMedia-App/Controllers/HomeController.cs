@@ -56,7 +56,7 @@ namespace SocialMedia_App.Controllers
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
             postVM.Comment.PostId = postId;
-            postVM.Comment.DatePosted = DateTime.Now;   
+            postVM.Comment.DatePosted = DateTime.Now;
             db.Comments.Add(postVM.Comment);
             db.SaveChanges();
             return RedirectToAction("Index");
@@ -67,12 +67,19 @@ namespace SocialMedia_App.Controllers
         {
             Post searchedPost = db.Posts.Find(id);
             List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
+            //Delete existing image
+            if (searchedPost.ImageURL != null)
+            {
+                string wwwRootPath = webHostEnvironment.WebRootPath;
+                string imageFullPath = Path.Combine(wwwRootPath, searchedPost.ImageURL.TrimStart('\\'));
+                System.IO.File.Delete(imageFullPath);
+            }
             db.Posts.Remove(searchedPost);
             db.Comments.RemoveRange(postComments);
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-        public IActionResult DeleteComment(int id)  
+        public IActionResult DeleteComment(int id)
         {
             Comment searchedComment = db.Comments.Find(id);
             db.Comments.Remove(searchedComment);
@@ -87,7 +94,7 @@ namespace SocialMedia_App.Controllers
             return View(viewModel.Post);
         }
         [HttpPost]
-        public IActionResult EditPost(Post editedPost, IFormFile? file)   
+        public IActionResult EditPost(Post editedPost, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -118,13 +125,13 @@ namespace SocialMedia_App.Controllers
             }
             return RedirectToAction("Index");
         }
-        
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        
+
         private PostViewModel GetViewModel()
         {
             var viewModel = new PostViewModel
