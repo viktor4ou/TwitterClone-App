@@ -15,7 +15,7 @@ namespace SocialMedia.Models.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        [Length(2,5,  ErrorMessage = "Content should be between 1 and 255 symbols")]
+        [Length(1,255,  ErrorMessage = "Content should be between 1 and 255 symbols")]
         public string Content { get; set; }
         public string? ImageURL { get; set; }
         [ValidateNever]
