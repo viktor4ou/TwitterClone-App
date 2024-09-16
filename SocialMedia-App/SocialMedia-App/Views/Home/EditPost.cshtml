@@ -11,13 +11,15 @@
                 <form method="post" enctype="multipart/form-data">
                     <input type="hidden" asp-for="@Model.ImageURL" />
                     <div class="mb-3">
-                        <label asp-for="@Model.Content">Description</label>
-                        <input asp-for="@Model.Content" type="text" class="form-control"/>
+                        <label asp-for="Content"></label>
+                        <input asp-for="Content" type="text" class="form-control" />
+                        <span asp-validation-for="Content" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label asp-for="@Model.ImageURL">Image</label>
-                        <input type="file" name="file" class="form-control"/>
+                        <input type="file" name="file" class="form-control" />
                     </div>
+                    <div asp-validation-summary="All" class="text-danger"></div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Edit Post</button>
@@ -31,9 +33,10 @@
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded',
-            function() {
+            function () {
                 var editPostModal = new bootstrap.Modal(document.getElementById('EditPost'));
                 editPostModal.show();
             });
     </script>
+    <partial name="_ValidationScriptsPartial" />
 }

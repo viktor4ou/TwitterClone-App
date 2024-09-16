@@ -13,12 +13,17 @@ namespace SocialMedia.Models.Models
     {
         [Key]
         public int CommentId { get; set; }
+
         [Required]
+        [Length(1, 2, ErrorMessage = "Comment should be between 1 and 255 symbols")]
         public string Content { get; set; }
+
         [ValidateNever]
         public DateTime DatePosted { get; set; }
+
         [ValidateNever]
         public int PostId { get; set; }
+
         [ForeignKey("PostId")]
         [ValidateNever]
         public Post Post { get; set; }
