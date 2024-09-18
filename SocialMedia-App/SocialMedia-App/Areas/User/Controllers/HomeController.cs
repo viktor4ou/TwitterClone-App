@@ -5,8 +5,9 @@ using SocialMedia.Models.Models;
 using Microsoft.AspNetCore.Hosting;
 using SocialMedia.Models.ViewModels;
 
-namespace SocialMedia_App.Controllers
+namespace SocialMedia_App.Areas.User.Controllers
 {
+    [Area("User")]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;

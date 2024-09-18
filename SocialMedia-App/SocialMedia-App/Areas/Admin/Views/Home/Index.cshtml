@@ -29,9 +29,9 @@
                             </button>
                             <!--Dropdown with all post manipulations-->
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li><a class="dropdown-item" asp-action="DeletePost" asp-route-id="@post.Id">Delete</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.Id">Delete</a></li>
                                 <!--TODO:Add Edit post functionality-->
-                                <li><a class="dropdown-item" asp-action="EditPost" asp-route-id="@post.Id">Edit</a></li>
+                                <li><a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.Id">Edit</a></li>
                             </ul>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                         </div>
                         <!--Comment form-->
                         <div class="collapse" id="commentForm-@post.Id">
-                            <form method="post" action="/Home/CreateComment" class="mt-2">
+                            <form method="post" asp-area="Admin" asp-controller="Home" asp-action="CreateComment" class="mt-2">
                                 <!--Returns the postId to the controller-->
                                 <input type="hidden" name="postId" value="@post.Id" />
                                 <div class="input-group mb-3">
@@ -86,7 +86,7 @@
                                                     </button>
                                                     <!--Dropdown with comment manipulation options-->
                                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        <li><a class="dropdown-item" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
+                                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -128,7 +128,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="post" asp-action="CreatePost" enctype="multipart/form-data">
+                <form method="post" asp-area="Admin" asp-controller="Home" asp-action="CreatePost" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label asp-for="@Model.Post.Content" class="form-label">Description</label>
                         <input asp-for="@Model.Post.Content" class="form-control" />
