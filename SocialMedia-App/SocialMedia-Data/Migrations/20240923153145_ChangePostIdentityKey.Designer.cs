@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923153145_ChangePostIdentityKey")]
+    partial class ChangePostIdentityKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,15 +248,24 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("CommentId");
 
+                    b.HasIndex("PostId");
+
                     b.ToTable("Comments");
 
                     b.HasData(
                         new
                         {
                             CommentId = 1,
-                            Content = "First Comment",
-                            DatePosted = new DateTime(2024, 9, 23, 18, 46, 51, 85, DateTimeKind.Local).AddTicks(8017),
+                            Content = "This is the content of the first comment",
+                            DatePosted = new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5129),
                             PostId = 1
+                        },
+                        new
+                        {
+                            CommentId = 2,
+                            Content = "This is the content of the second comment",
+                            DatePosted = new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5133),
+                            PostId = 2
                         });
                 });
 
@@ -287,8 +299,15 @@ namespace SocialMedia.Data.Migrations
                         new
                         {
                             PostId = 1,
-                            Content = "First Post",
-                            DatePosted = new DateTime(2024, 9, 23, 18, 46, 51, 85, DateTimeKind.Local).AddTicks(7646),
+                            Content = "This is the content of the first post",
+                            DatePosted = new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(4979),
+                            Likes = 0
+                        },
+                        new
+                        {
+                            PostId = 2,
+                            Content = "This is the content of the second post",
+                            DatePosted = new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5021),
                             Likes = 0
                         });
                 });
@@ -342,6 +361,17 @@ namespace SocialMedia.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SocialMedia.Models.Models.Comment", b =>
+                {
+                    b.HasOne("SocialMedia.Models.Models.Post", "Post")
+                        .WithMany()
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
                 });
 #pragma warning restore 612, 618
         }

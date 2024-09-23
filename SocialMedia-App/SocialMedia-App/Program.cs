@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace SocialMedia_App
 {
@@ -13,6 +14,11 @@ namespace SocialMedia_App
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddRazorPages();
+            builder.Services.AddDefaultIdentity<IdentityUser>(/*options => options.SignIn.RequireConfirmedAccount = true*/).AddEntityFrameworkStores<ApplicationDbContext>();
+
+            
+            
             var app = builder.Build();
                 
             // Configure the HTTP request pipeline.
@@ -25,9 +31,9 @@ namespace SocialMedia_App
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.MapRazorPages();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
