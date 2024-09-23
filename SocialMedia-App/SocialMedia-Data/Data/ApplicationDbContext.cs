@@ -14,7 +14,7 @@ namespace SocialMedia.Data.Data
 
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,9 +29,6 @@ namespace SocialMedia.Data.Data
                 new Comment { CommentId = 1, Content = "First Comment", DatePosted = DateTime.Now, PostId = 1 }
             );
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.EnableSensitiveDataLogging();
-        }
+        
     }
 }
