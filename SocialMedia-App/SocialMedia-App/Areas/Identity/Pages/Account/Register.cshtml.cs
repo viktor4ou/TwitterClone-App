@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -30,13 +32,15 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,60 +48,36 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _webHostEnvironment = webHostEnvironment;
         }
-
-        
-        
-
 
         [BindProperty]
         public InputModel Input { get; set; }
 
-        
-        
-
-
         public string ReturnUrl { get; set; }
-
-        
-        
-
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        
-        
-
-
         public class InputModel
         {
-            
-            
-    
-    
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            
-            
-    
-    
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            
-            
-    
-    
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+
+            [DisplayName("Upload image")]
+            public IFormFile Image { get; set; }
         }
 
 
@@ -122,6 +102,28 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+                    string filename;
+                    if (Input.Image != null)
+                    {
+                        string wwwRootPath = _webHostEnvironment.WebRootPath;
+                        filename = Guid.NewGuid().ToString() + Path.GetExtension(Input.Image.FileName);
+                        string productPath = Path.Combine(wwwRootPath, @"images\profile");
+
+                        using (FileStream stream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
+                        {
+                            Input.Image.CopyTo(stream);
+                        }
+                    }
+                    else
+                    {
+                        filename = "default.jpg";
+                    }
+
+                    // Set the ProfileImageURL property
+                    user.ProfileImageURL = Path.Combine(@"images\profile", filename);
+
+                    // Update the user in the database
+                    await _userManager.UpdateAsync(user);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
