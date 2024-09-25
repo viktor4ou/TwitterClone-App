@@ -10,7 +10,10 @@ namespace SocialMedia.Models.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string?  ProfileImageURL { get; set; }   
+        public string?  ProfileImageURL { get; set; }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
     }
 }
