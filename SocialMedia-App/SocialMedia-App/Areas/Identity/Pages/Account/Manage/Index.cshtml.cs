@@ -24,53 +24,37 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
             _userManager = userManager;
             _signInManager = signInManager;
         }
-
-        
-        
-
-
+        public string Email { get; set; }
         public string Username { get; set; }
-
-        
-        
-
-
         [TempData]
         public string StatusMessage { get; set; }
-
-        
-        
-
 
         [BindProperty]
         public InputModel Input { get; set; }
 
-        
-        
-
-
         public class InputModel
         {
-            
-            
-    
-    
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            [Display(Name = "Username")]
+            public string Username { get; set; }
+            [Display(Name = "Profile Image")]
+            public IFormFile ProfileImage { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
         {
-            var userName = await _userManager.GetUserNameAsync(user);
+            var email = await _userManager.GetEmailAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            Username = userName;
-
+            var username = await _userManager.GetUserNameAsync(user);
+            Email = email;
+            Username = username;
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
-            };
+                PhoneNumber = phoneNumber,
+                Username = username
+            }; ;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -106,6 +90,17 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    return RedirectToPage();
+                }
+            }
+
+            var username = await _userManager.GetUserNameAsync(user);
+            if (Input.Username != username)
+            {
+                var setUsername = await _userManager.SetUserNameAsync(user, Input.Username);
+                if (!setUsername.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to set username.";
                     return RedirectToPage();
                 }
             }
