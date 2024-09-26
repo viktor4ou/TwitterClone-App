@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SocialMedia.Models.Models;
 
 namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
 {
@@ -26,6 +27,8 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
         }
         public string Email { get; set; }
         public string Username { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -39,6 +42,10 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
             public string PhoneNumber { get; set; }
             [Display(Name = "Username")]
             public string Username { get; set; }
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
             [Display(Name = "Profile Image")]
             public IFormFile ProfileImage { get; set; }
         }
@@ -48,8 +55,10 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
             var email = await _userManager.GetEmailAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             var username = await _userManager.GetUserNameAsync(user);
+
             Email = email;
             Username = username;
+
             Input = new InputModel
             {
                 PhoneNumber = phoneNumber,
