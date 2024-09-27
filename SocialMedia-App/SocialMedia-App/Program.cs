@@ -18,7 +18,7 @@ namespace SocialMedia_App
             builder.Services.AddRazorPages();
             builder.Services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddUserManager<CustomUserManager>(); 
+                .AddUserManager<CustomUserManager>();
             var app = builder.Build();
                 
             // Configure the HTTP request pipeline.
