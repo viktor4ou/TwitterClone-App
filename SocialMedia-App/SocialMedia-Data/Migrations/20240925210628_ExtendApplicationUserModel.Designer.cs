@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240925210628_ExtendApplicationUserModel")]
+    partial class ExtendApplicationUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,7 +264,7 @@ namespace SocialMedia.Data.Migrations
                         {
                             CommentId = 1,
                             Content = "First Comment",
-                            DatePosted = new DateTime(2024, 9, 27, 23, 45, 4, 923, DateTimeKind.Local).AddTicks(1933),
+                            DatePosted = new DateTime(2024, 9, 26, 0, 6, 26, 127, DateTimeKind.Local).AddTicks(1431),
                             PostId = 1
                         });
                 });
@@ -297,7 +300,7 @@ namespace SocialMedia.Data.Migrations
                         {
                             PostId = 1,
                             Content = "First Post",
-                            DatePosted = new DateTime(2024, 9, 27, 23, 45, 4, 923, DateTimeKind.Local).AddTicks(1706),
+                            DatePosted = new DateTime(2024, 9, 26, 0, 6, 26, 127, DateTimeKind.Local).AddTicks(1214),
                             Likes = 0
                         });
                 });
