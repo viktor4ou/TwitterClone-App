@@ -2,26 +2,40 @@
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject CustomUserManager customUserManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
-{
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
-        </form>
-    </li>
-}
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var user = await UserManager.GetUserAsync(User) as ApplicationUser;
+        var imageURL = await customUserManager.GetImageURLAsync(user);
+        <div class="dropdown dropstart">
+            <a class="dropdown-toggle " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="/@imageURL" class="rounded-circle img-thumbnail" style="height: 32px; width: 32px;" />
+            </a>
+            <ul class="dropdown-menu p-0">
+                <li class="dropdown-item nav-link  border-bottom border-top my-0">
+                    <button class="nav-link btn btn-link text-dark border-0 ">Profile</button>
+                </li>
+                <li class="dropdown-item nav-link border-bottom">
+                    <a id="manage" class="nav-link btn btn-link text-dark border-0" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Manage</a>
+                </li>
+                <li class="dropdown-item nav-link border-bottom">
+                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
 </ul>
