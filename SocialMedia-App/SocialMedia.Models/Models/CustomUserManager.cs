@@ -39,6 +39,11 @@ namespace SocialMedia.Models.Models
         {
             return user.FirstName;
         }
+
+        public async Task<string> GetImageURLAsync(ApplicationUser user)
+        {
+            return user.ProfileImageURL;
+        }
         public async Task<string> GetLastNameAsync(ApplicationUser user)
         {
             return user.LastName;
