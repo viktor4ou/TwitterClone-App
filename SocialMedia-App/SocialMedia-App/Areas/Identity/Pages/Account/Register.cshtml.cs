@@ -33,14 +33,15 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+        private readonly CustomUserManager customUserManager;
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            CustomUserManager customUserManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -49,6 +50,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _webHostEnvironment = webHostEnvironment;
+            this.customUserManager = customUserManager;
         }
 
         [BindProperty]
@@ -76,6 +78,18 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            [Required]
+            [Display(Name = "Username")]
+            public string Username { get; set; }
+
+            [Required]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Required]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+
             [DisplayName("Upload image")]
             public IFormFile Image { get; set; }
         }
@@ -97,6 +111,9 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                await _userManager.SetUserNameAsync(user, Input.Username);
+                await customUserManager.SetFirstNameAsync(user, Input.FirstName);
+                await customUserManager.SetLastNameAsync(user, Input.LastName);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
