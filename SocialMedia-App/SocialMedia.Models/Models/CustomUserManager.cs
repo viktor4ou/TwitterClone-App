@@ -40,6 +40,16 @@ namespace SocialMedia.Models.Models
             return user.FirstName;
         }
 
+        public async Task<int> GetFollowersCountAsync(ApplicationUser user)
+        {
+            return user.Followers;
+        }
+
+        public async Task<int> GetFollowingCountAsync(ApplicationUser user)
+        {
+            return user.Following;
+        }
+
         public async Task<string> GetImageURLAsync(ApplicationUser user)
         {
             return user.ProfileImageURL;
