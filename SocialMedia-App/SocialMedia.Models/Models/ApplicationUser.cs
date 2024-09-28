@@ -13,6 +13,8 @@ namespace SocialMedia.Models.Models
         public string?  ProfileImageURL { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public int Followers { get; set; }
+        public int Following { get; set; }  
 
     }
 }
