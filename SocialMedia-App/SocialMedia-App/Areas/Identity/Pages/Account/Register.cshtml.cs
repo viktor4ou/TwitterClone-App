@@ -124,7 +124,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
                     {
                         string wwwRootPath = _webHostEnvironment.WebRootPath;
                         filename = Guid.NewGuid().ToString() + Path.GetExtension(Input.Image.FileName);
-                        string productPath = Path.Combine(wwwRootPath, @"\images\profile");
+                        string productPath = Path.Combine(wwwRootPath, @"images\profile");
 
                         using (FileStream stream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                         {
