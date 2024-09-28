@@ -124,7 +124,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
                     {
                         string wwwRootPath = _webHostEnvironment.WebRootPath;
                         filename = Guid.NewGuid().ToString() + Path.GetExtension(Input.Image.FileName);
-                        string productPath = Path.Combine(wwwRootPath, @"images\profile");
+                        string productPath = Path.Combine(wwwRootPath, @"\images\profile");
 
                         using (FileStream stream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                         {
@@ -137,7 +137,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
                     }
 
                     // Set the ProfileImageURL property
-                    user.ProfileImageURL = Path.Combine(@"images\profile", filename);
+                    user.ProfileImageURL = Path.Combine(@"\images\profile", filename);
 
                     // Update the user in the database
                     await _userManager.UpdateAsync(user);
