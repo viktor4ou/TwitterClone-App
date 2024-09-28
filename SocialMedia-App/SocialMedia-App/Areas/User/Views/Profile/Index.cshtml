@@ -1,7 +1,52 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@model SocialMedia.Models.ViewModels.ProfileViewModel
+
+@using Microsoft.AspNetCore.Identity
+
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject CustomUserManager customUserManager
 
-<h1> profila brattt</h1>
+<div class="container my-5">
+    <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
+        <div class="col-auto d-flex align-items-center">
+            <img class="rounded-circle" src="@Model.ProfilePictureURL" alt="Profile Picture" width="80" height="80">
+        </div>
+        <div class="col">
+            <h4 class="mb-0">@Model.FristName @Model.LastName</h4>
+            <p class="text-muted mb-0">@@@Model.Username</p>
+            <div class="d-block align-content-center">
+                <p class="text-dark mb-0 d-inline">Followers: @Model.Followers</p>
+                <p class="text-dark mb-0 d-inline ms-3">Following: @Model.Following</p>
+            </div>
+        </div>
+        <div class="col-auto d-flex align-items-center">
+            <button class="btn btn-primary btn-sm">Follow</button>
+        </div>
+    </div>
+
+    <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
+        <div class="col-12">
+            <h3 class="mb-3">My Posts</h3>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <img src="post1.jpg" class="card-img-top" alt="Post 1">
+                <div class="card-body">
+                    <h5 class="card-title">Post 1 Title</h5>
+                    <p class="card-text">This is the content of the first post.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <img src="post2.jpg" class="card-img-top" alt="Post 2">
+                <div class="card-body">
+                    <h5 class="card-title">Post 2 Title</h5>
+                    <p class="card-text">This is the content of the second post.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
