@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SocialMedia.Models.Models;
 
 namespace SocialMedia.Models.ViewModels
 {
@@ -15,5 +16,7 @@ namespace SocialMedia.Models.ViewModels
         public string ProfilePictureURL { get; set; }
         public int Followers { get; set; }
         public int Following { get; set; }
+
+        public List<Post> Posts = new();
     }
 }
