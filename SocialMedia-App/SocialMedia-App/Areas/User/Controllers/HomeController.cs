@@ -3,6 +3,7 @@ using System.Diagnostics;
 using SocialMedia.Data.Data;
 using SocialMedia.Models.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using SocialMedia.Models.ViewModels;
 
 namespace SocialMedia_App.Areas.User.Controllers
@@ -12,12 +13,15 @@ namespace SocialMedia_App.Areas.User.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
-
-        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
 
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
 
 
@@ -46,6 +50,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                     postVM.Post.ImageURL = @"\images\posts\" + filename;
                 }
 
+                var user = signInManager.UserManager.GetUserAsync(User).Result;
+                postVM.Post.PostOwnerId = user.Id;
                 postVM.Post.DatePosted = DateTime.Now;
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
@@ -54,6 +60,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             ViewData["ShowModal"] = true;
             return View("Index", postVM);
         }
+
+
         [HttpPost]
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
