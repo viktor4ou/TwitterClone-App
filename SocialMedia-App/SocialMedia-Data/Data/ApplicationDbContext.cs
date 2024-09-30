@@ -21,12 +21,12 @@ namespace SocialMedia.Data.Data
 
             // Seed data for Posts
             modelBuilder.Entity<Post>().HasData(
-                new Post { PostId = 1, Content = "First Post", DatePosted = DateTime.Now }
+                new Post { PostId = 1, Content = "First Post", DatePosted = DateTime.Now, PostOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b" }
             );
 
             // Seed data for Comments
             modelBuilder.Entity<Comment>().HasData(
-                new Comment { CommentId = 1, Content = "First Comment", DatePosted = DateTime.Now, PostId = 1 }
+                new Comment { CommentId = 1, Content = "First Comment", DatePosted = DateTime.Now, PostId = 1, CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b" }
             );
         }
         
