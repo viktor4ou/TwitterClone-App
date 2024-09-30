@@ -10,6 +10,9 @@ namespace SocialMedia.Models.Models
         [Key]
         public int PostId { get; set; }
 
+        [ValidateNever]
+        public string PostOwnerId { get; set; } 
+
         [Required]
         [StringLength(255, MinimumLength = 1, ErrorMessage = "Content should be between 1 and 255 symbols")]
         public string Content { get; set; }
