@@ -14,6 +14,8 @@ namespace SocialMedia.Models.ViewModels
         {
 
         }
+        [ValidateNever]
+        public ApplicationUser User { get; set; }
         public Post Post { get; set; }
         [ValidateNever]
         public Comment Comment { get; set; }
