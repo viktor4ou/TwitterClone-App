@@ -1,4 +1,6 @@
 ﻿@model SocialMedia.Models.ViewModels.PostViewModel
+
+@inject SignInManager<IdentityUser> SignInManager
 <div>
     <!--Main Title-->
     <div class="container text-center post-card">
@@ -6,9 +8,12 @@
         <div class="title-underline"></div>
     </div>
     <!-- Create post button -->
-    <div class="container position-relative d-flex justify-content-end">
-        <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreatePostModal"><i class="bi bi-highlighter"></i> Create Post</button>
-    </div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <div class="container position-relative d-flex justify-content-end">
+            <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreatePostModal"><i class="bi bi-highlighter"></i> Create Post</button>
+        </div>
+    }
     <!--Display all posts-->
     @foreach (var post in @Model.Posts)
     {
