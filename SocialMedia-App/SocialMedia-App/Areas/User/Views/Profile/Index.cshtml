@@ -1,11 +1,5 @@
 ﻿@model SocialMedia.Models.ViewModels.ProfileViewModel
 
-@using Microsoft.AspNetCore.Identity
-
-
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
-@inject CustomUserManager customUserManager
 
 <div class="container my-5">
     <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
@@ -29,24 +23,44 @@
         <div class="col-12">
             <h3 class="mb-3">My Posts</h3>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <img src="post1.jpg" class="card-img-top" alt="Post 1">
-                <div class="card-body">
-                    <h5 class="card-title">Post 1 Title</h5>
-                    <p class="card-text">This is the content of the first post.</p>
+        @foreach (var post in Model.Posts.Where(p => p.PostOwnerId == @Model.UserID))
+        {
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="d-flex align-items-center">
+                        <!--TODO:Change it to user info-->
+
+                        <div class="me-2">
+                            <img src="@Model.ProfilePictureURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                        </div>
+
+                        <div>
+                            <h6 class="mb-0">@Model.FristName @Model.LastName</h6>
+                            <small class="text-muted">@post.TimeAgo</small>
+                        </div>
+                        <div class="dropdown me-2 ms-auto">
+                            <!--Button for post manipulation-->
+                            <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <!--Dropdown with all post manipulations-->
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
+                                <!--TODO:Add Edit post functionality-->
+                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>@post.Content</p>
+                    @if (!string.IsNullOrEmpty(post.ImageURL))
+                    {
+                        <img src="@post.ImageURL" alt="Post Image" class="img-fluid" />
+                    }
                 </div>
             </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
-                <img src="post2.jpg" class="card-img-top" alt="Post 2">
-                <div class="card-body">
-                    <h5 class="card-title">Post 2 Title</h5>
-                    <p class="card-text">This is the content of the second post.</p>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 
 </div>
