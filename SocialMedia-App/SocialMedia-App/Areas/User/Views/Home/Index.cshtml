@@ -1,6 +1,8 @@
 ﻿@model SocialMedia.Models.ViewModels.PostViewModel
 
 @inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
 <div>
     <!--Main Title-->
     <div class="container text-center post-card">
@@ -14,17 +16,23 @@
             <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreatePostModal"><i class="bi bi-highlighter"></i> Create Post</button>
         </div>
     }
+
     <!--Display all posts-->
     @foreach (var post in @Model.Posts)
     {
+        var user = await UserManager.FindByIdAsync(post.PostOwnerId) as ApplicationUser;
         <div class="container mt-2">
             <div class="post-card">
                 <div class="post-header">
                     <div class="d-flex align-items-center">
                         <!--TODO:Change it to user info-->
-                        <div class="profile-pic rounded-circle me-2">AN</div>
+                        
+                        <div class="me-2">
+                            <img src="@user.ProfileImageURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                        </div>
+
                         <div>
-                            <h6 class="mb-0">Author name</h6>
+                            <h6 class="mb-0">@user.FirstName @user.LastName</h6>
                             <small class="text-muted">@post.TimeAgo</small>
                         </div>
                         <div class="dropdown me-2 ms-auto">
