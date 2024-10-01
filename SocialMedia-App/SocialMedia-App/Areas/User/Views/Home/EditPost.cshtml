@@ -9,6 +9,7 @@
             <div class="modal-body">
                 <form method="post" enctype="multipart/form-data">
                     <input type="hidden" asp-for="ImageURL" />
+                    <input type="hidden" asp-for="PostId"/>
                     <div class="mb-3">
                         <label asp-for="Content"></label>
                         <input asp-for="Content" type="text" class="form-control" />
