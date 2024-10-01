@@ -51,14 +51,18 @@ namespace SocialMedia_App.Areas.User.Controllers
                     postVM.Post.ImageURL = @"\images\posts\" + filename;
                 }
 
-                var user = signInManager.UserManager.GetUserAsync(User).Result;
-                postVM.Post.PostOwnerId = user.Id;
+                var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+
+                postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
+
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             ViewData["ShowModal"] = true;
+
             return View("Index", postVM);
         }
 
@@ -66,10 +70,15 @@ namespace SocialMedia_App.Areas.User.Controllers
         [HttpPost]
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+
             postVM.Comment.PostId = postId;
             postVM.Comment.DatePosted = DateTime.Now;
+            postVM.Comment.CommentOwnerId = currentLoggedUser.Id;
+
             db.Comments.Add(postVM.Comment);
             db.SaveChanges();
+
             return RedirectToAction("Index");
             //How to make it to just load the comment without refreshing the page like in a real time chat
         }
@@ -100,9 +109,17 @@ namespace SocialMedia_App.Areas.User.Controllers
 
         public IActionResult DeleteComment(int id)
         {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
             Comment searchedComment = db.Comments.Find(id);
+
+            if (searchedComment.CommentOwnerId != currentLoggedUser.Id)
+            {
+                return Unauthorized();
+            }
+
             db.Comments.Remove(searchedComment);
             db.SaveChanges();
+
             return RedirectToAction("Index");
         }
 
@@ -156,8 +173,10 @@ namespace SocialMedia_App.Areas.User.Controllers
 
                 editedPost.DatePosted = DateTime.Now;
                 editedPost.PostOwnerId = user.Id;
+
                 db.Posts.Update(editedPost);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             return View("EditPost", editedPost);

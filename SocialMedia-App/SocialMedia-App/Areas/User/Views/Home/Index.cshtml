@@ -74,48 +74,59 @@
                                 </button>
                             </div>
                             <!--Comment form-->
-                            <div class="collapse" id="commentForm-@post.PostId">
-                                <form method="post" asp-area="User" asp-controller="Home" asp-action="CreateComment" class="mt-2">
-                                    <!--Returns the postId to the controller-->
-                                    <input type="hidden" name="postId" value="@post.PostId" />
-                                    <div class="input-group mb-3">
-                                        <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
-                                        <button class="btn btn-outline-info text-dark d-block" type="submit"><i class="bi bi-send"></i></button>
-                                    </div>
-                                    <span asp-validation-for="@Model.Comment.Content" class="text-danger"></span>
-                                </form>
-                            </div>
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <div class="collapse" id="commentForm-@post.PostId">
+                                    <form method="post" asp-area="User" asp-controller="Home" asp-action="CreateComment" class="mt-2">
+                                        <!--Returns the postId to the controller-->
+                                        <input type="hidden" name="postId" value="@post.PostId" />
+                                        <input type="hidden" asp-for="User.Id"/>
+                                        <div class="input-group mb-3">
+                                            <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
+                                            <button class="btn btn-outline-info text-dark d-block" type="submit"><i class="bi bi-send"></i></button>
+                                        </div>
+                                        <span asp-validation-for="@Model.Comment.Content" class="text-danger"></span>
+                                    </form>
+                                </div>
+                            }
                         @if (@Model.Comments.Any(i => i.PostId == @post.PostId))
                         {
                                     <!--Display all comments-->
                             @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.PostId))
                             {
-                                            <div class="container mt-1">
-                                                <div class="row rounded border p-2">
-                                                    <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
-                                                        <div class="d-flex align-items-center">
-                                                            <div class="profile-pic rounded-circle me-2">AN</div>
-                                                            <h6 class="content-wrapper mb-0">Author Name</h6>
-                                                            <!--Dropdown for comment manipulations-->
-                                                            <div class="dropdown ms-auto">
-                                                                <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <i class="bi bi-three-dots"></i>
-                                                                </button>
-                                                                <!--Dropdown with comment manipulation options-->
-                                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                    <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
-                                            @comment.Content
-                                                    </div>
-                                                    <div class="col-md-3 d-flex align-items-center justify-content-md-end">
-                                                        <small class="text-wrap">@comment.TimeAgo</small>
-                                                    </div>
+                                var commentOwner = SignInManager.UserManager.FindByIdAsync(comment.CommentOwnerId).Result as ApplicationUser;
+
+                                <div class="container mt-1">
+                                    <div class="row rounded border p-2">
+                                        <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <img src="@commentOwner.ProfileImageURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
                                                 </div>
+                                                <h6 class="content-wrapper mb-0">@commentOwner.FirstName @commentOwner.LastName</h6>
+                                                <!--Dropdown for comment manipulations-->
+                                                @if (currentUser.Id == comment.CommentOwnerId)
+                                                {
+                                                    <div class="dropdown ms-auto">
+                                                        <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots"></i>
+                                                        </button>
+                                                        <!--Dropdown with comment manipulation options-->
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                }
                                             </div>
+                                        </div>
+                                        <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
+                                             @comment.Content
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-center justify-content-md-end">
+                                            <small class="text-wrap">@comment.TimeAgo</small>
+                                        </div>
+                                    </div>
+                                </div>
                             }
                         }
                         </div>
