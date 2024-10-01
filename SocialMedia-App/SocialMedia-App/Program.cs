@@ -16,7 +16,10 @@ namespace SocialMedia_App
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddRazorPages();
-            builder.Services.AddDefaultIdentity<IdentityUser>()
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+                {
+                    options.Lockout.AllowedForNewUsers = false; // Disable account lockout
+                })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddUserManager<CustomUserManager>();
             var app = builder.Build();
