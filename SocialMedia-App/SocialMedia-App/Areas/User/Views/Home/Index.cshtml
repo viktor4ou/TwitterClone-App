@@ -105,7 +105,7 @@
                                                 </div>
                                                 <h6 class="content-wrapper mb-0">@commentOwner.FirstName @commentOwner.LastName</h6>
                                                 <!--Dropdown for comment manipulations-->
-                                                @if (currentUser.Id == comment.CommentOwnerId)
+                                                @if ((currentUser != null && currentUser.Id == comment.CommentOwnerId) || post.PostOwnerId == currentUser.Id)
                                                 {
                                                     <div class="dropdown ms-auto">
                                                         <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -113,7 +113,7 @@
                                                         </button>
                                                         <!--Dropdown with comment manipulation options-->
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                            <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
+                                                            <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-commentId="@comment.CommentId" asp-route-postId="@post.PostId">Delete</a></li>
                                                         </ul>
                                                     </div>
                                                 }

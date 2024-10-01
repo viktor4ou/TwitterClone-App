@@ -107,12 +107,12 @@ namespace SocialMedia_App.Areas.User.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult DeleteComment(int id)
+        public IActionResult DeleteComment(int commentId, int postId)
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-            Comment searchedComment = db.Comments.Find(id);
-
-            if (searchedComment.CommentOwnerId != currentLoggedUser.Id)
+            Comment searchedComment = db.Comments.Find(commentId);
+            Post searchedPost = db.Posts.Find(postId);
+            if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
             {
                 return Unauthorized();
             }
