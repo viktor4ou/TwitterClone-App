@@ -130,6 +130,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 }
 
                 editedPost.DatePosted = DateTime.Now;
+                editedPost.PostOwnerId = signInManager.UserManager.GetUserAsync(User).Result.Id;
                 db.Posts.Update(editedPost);
                 db.SaveChanges();
                 return RedirectToAction("Index");
