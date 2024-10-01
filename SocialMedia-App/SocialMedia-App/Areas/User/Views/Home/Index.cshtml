@@ -1,4 +1,8 @@
 ﻿@model SocialMedia.Models.ViewModels.PostViewModel
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
 <div>
     <!--Main Title-->
     <div class="container text-center post-card">
@@ -6,93 +10,117 @@
         <div class="title-underline"></div>
     </div>
     <!-- Create post button -->
-    <div class="container position-relative d-flex justify-content-end">
-        <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreatePostModal"><i class="bi bi-highlighter"></i> Create Post</button>
-    </div>
+    @if (SignInManager.IsSignedIn(User))
+    {
+            <div class="container position-relative d-flex justify-content-end">
+                <button type="button" class="btn btn-primary my-2 justify-content-center" data-bs-toggle="modal" data-bs-target="#CreatePostModal"><i class="bi bi-highlighter"></i> Create Post</button>
+            </div>
+    }
+
     <!--Display all posts-->
     @foreach (var post in @Model.Posts)
     {
-        <div class="container mt-2">
-            <div class="post-card">
-                <div class="post-header">
-                    <div class="d-flex align-items-center">
-                        <!--TODO:Change it to user info-->
-                        <div class="profile-pic rounded-circle me-2">AN</div>
-                        <div>
-                            <h6 class="mb-0">Author name</h6>
-                            <small class="text-muted">@post.TimeAgo</small>
-                        </div>
-                        <div class="dropdown me-2 ms-auto">
-                            <!--Button for post manipulation-->
-                            <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots"></i>
-                            </button>
-                            <!--Dropdown with all post manipulations-->
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
-                                <!--TODO:Add Edit post functionality-->
-                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
-                            </ul>
+        var user = await UserManager.FindByIdAsync(post.PostOwnerId) as ApplicationUser;
+        var currentUser = await UserManager.GetUserAsync(User);
+            <div class="container mt-2">
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="d-flex align-items-center">
+                            <!--TODO:Change it to user info-->
+
+                            <div class="me-2">
+                                <img src="@user.ProfileImageURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                            </div>
+
+                            <div>
+                                <h6 class="mb-0">@user.FirstName @user.LastName</h6>
+                                <small class="text-muted">@post.TimeAgo</small>
+                            </div>
+                        @if (currentUser != null && currentUser.Id == post.PostOwnerId)
+                        {
+                            <div class="dropdown me-2 ms-auto">
+                                <!--Button for post manipulation-->
+                                <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <!--Dropdown with all post manipulations-->
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
+                                    <!--TODO:Add Edit post functionality-->
+                                    <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
+                                </ul>
+                            </div>
+                        }
                         </div>
                     </div>
-                </div>
-                <div class="post-content">
-                    <p>@post.Content</p>
+                    <div class="post-content">
+                        <p>@post.Content</p>
                     @if (!string.IsNullOrEmpty(post.ImageURL))
                     {
-                        <img src="@post.ImageURL" alt="Post Image" class="img-fluid" />
+                                <img src="@post.ImageURL" alt="Post Image" class="img-fluid" />
                     }
-                </div>
-                <div class="post-footer">
-                    <div class="container">
-                        <!--Like and comment buttons-->
+                    </div>
+                    <div class="post-footer">
                         <div class="container">
+                            <!--Like and comment buttons-->
+                            <div class="container">
                             @post.Likes
-                            <button class="btn btn-like me-3">
-                                <i class="bi bi-hand-thumbs-up me-2"></i>Like
-                                <!-- TODO: Create post request and handle it in the controller-->
-                            </button>
-                            <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
-                                <i class="bi bi-chat"></i> Comment
-                            </button>
-                        </div>
-                        <!--Comment form-->
-                        <div class="collapse" id="commentForm-@post.PostId">
-                            <form method="post" asp-area="User" asp-controller="Home" asp-action="CreateComment" class="mt-2">
-                                <!--Returns the postId to the controller-->
-                                <input type="hidden" name="postId" value="@post.PostId" />
-                                <div class="input-group mb-3">
-                                    <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
-                                    <button class="btn btn-outline-info text-dark d-block" type="submit"><i class="bi bi-send"></i></button>
+                                <button class="btn btn-like me-3">
+                                    <i class="bi bi-hand-thumbs-up me-2"></i>Like
+                                    <!-- TODO: Create post request and handle it in the controller-->
+                                </button>
+                                <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
+                                    <i class="bi bi-chat"></i> Comment
+                                </button>
+                            </div>
+                            <!--Comment form-->
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <div class="collapse" id="commentForm-@post.PostId">
+                                    <form method="post" asp-area="User" asp-controller="Home" asp-action="CreateComment" class="mt-2">
+                                        <!--Returns the postId to the controller-->
+                                        <input type="hidden" name="postId" value="@post.PostId" />
+                                        <input type="hidden" asp-for="User.Id"/>
+                                        <div class="input-group mb-3">
+                                            <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
+                                            <button class="btn btn-outline-info text-dark d-block" type="submit"><i class="bi bi-send"></i></button>
+                                        </div>
+                                        <span asp-validation-for="@Model.Comment.Content" class="text-danger"></span>
+                                    </form>
                                 </div>
-                                <span asp-validation-for="@Model.Comment.Content" class="text-danger"></span>
-                            </form>
-                        </div>
+                            }
                         @if (@Model.Comments.Any(i => i.PostId == @post.PostId))
                         {
-                            <!--Display all comments-->
+                                    <!--Display all comments-->
                             @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.PostId))
                             {
+                                var commentOwner = SignInManager.UserManager.FindByIdAsync(comment.CommentOwnerId).Result as ApplicationUser;
+
                                 <div class="container mt-1">
                                     <div class="row rounded border p-2">
                                         <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
                                             <div class="d-flex align-items-center">
-                                                <div class="profile-pic rounded-circle me-2">AN</div>
-                                                <h6 class="content-wrapper mb-0">Author Name</h6>
-                                                <!--Dropdown for comment manipulations-->
-                                                <div class="dropdown ms-auto">
-                                                    <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i class="bi bi-three-dots"></i>
-                                                    </button>
-                                                    <!--Dropdown with comment manipulation options-->
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                        <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-id="@comment.CommentId">Delete</a></li>
-                                                    </ul>
+                                                <div class="me-2">
+                                                    <img src="@commentOwner.ProfileImageURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
                                                 </div>
+                                                <h6 class="content-wrapper mb-0">@commentOwner.FirstName @commentOwner.LastName</h6>
+                                                <!--Dropdown for comment manipulations-->
+                                                @if ((currentUser != null && currentUser.Id == comment.CommentOwnerId) || post.PostOwnerId == currentUser.Id)
+                                                {
+                                                    <div class="dropdown ms-auto">
+                                                        <button class="btn btn-sm ms-2" style="margin-top: 4px" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots"></i>
+                                                        </button>
+                                                        <!--Dropdown with comment manipulation options-->
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                            <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeleteComment" asp-route-commentId="@comment.CommentId" asp-route-postId="@post.PostId">Delete</a></li>
+                                                        </ul>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                         <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
-                                            @comment.Content
+                                             @comment.Content
                                         </div>
                                         <div class="col-md-3 d-flex align-items-center justify-content-md-end">
                                             <small class="text-wrap">@comment.TimeAgo</small>
@@ -101,23 +129,23 @@
                                 </div>
                             }
                         }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     }
 </div>
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var showModal = '@ViewData["ShowModal"]' === 'True';
-            if (showModal) {
-                var createPostModal = new bootstrap.Modal(document.getElementById('CreatePostModal'));
-                createPostModal.show();
-            }
-        });
-    </script>
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var showModal = '@ViewData["ShowModal"]' === 'True';
+                if (showModal) {
+                    var createPostModal = new bootstrap.Modal(document.getElementById('CreatePostModal'));
+                    createPostModal.show();
+                }
+            });
+        </script>
 }
 <!-- Create Post Modal -->
 <div class="modal fade @((ViewData["ShowModal"] as bool? == true ? "show" : ""))" id="CreatePostModal" tabindex="-1" aria-labelledby="CreatePostModalLabel" aria-hidden="true" style="display: @((ViewData["ShowModal"] as bool? == true ? "block" : "none"));">
@@ -147,5 +175,3 @@
         </div>
     </div>
 </div>
-
-

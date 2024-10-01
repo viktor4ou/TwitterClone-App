@@ -3,7 +3,9 @@ using System.Diagnostics;
 using SocialMedia.Data.Data;
 using SocialMedia.Models.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using SocialMedia.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocialMedia_App.Areas.User.Controllers
 {
@@ -12,12 +14,15 @@ namespace SocialMedia_App.Areas.User.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
-
-        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
 
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
         }
 
 
@@ -46,30 +51,50 @@ namespace SocialMedia_App.Areas.User.Controllers
                     postVM.Post.ImageURL = @"\images\posts\" + filename;
                 }
 
+                var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+
+                postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
+
                 db.Posts.Add(postVM.Post);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             ViewData["ShowModal"] = true;
+
             return View("Index", postVM);
         }
+
+
         [HttpPost]
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+
             postVM.Comment.PostId = postId;
             postVM.Comment.DatePosted = DateTime.Now;
+            postVM.Comment.CommentOwnerId = currentLoggedUser.Id;
+
             db.Comments.Add(postVM.Comment);
             db.SaveChanges();
+
             return RedirectToAction("Index");
             //How to make it to just load the comment without refreshing the page like in a real time chat
         }
 
         public IActionResult DeletePost(int id)
         {
+            var user = userManager.GetUserAsync(User).Result;
             Post searchedPost = db.Posts.Find(id);
+
+            if (searchedPost == null || searchedPost.PostOwnerId != user.Id)
+            {
+                return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
+            }
+
             List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
-            //Delete existing image
+            // Delete existing image
             if (searchedPost.ImageURL != null)
             {
                 string wwwRootPath = webHostEnvironment.WebRootPath;
@@ -81,38 +106,63 @@ namespace SocialMedia_App.Areas.User.Controllers
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-        public IActionResult DeleteComment(int id)
+
+        public IActionResult DeleteComment(int commentId, int postId)
         {
-            Comment searchedComment = db.Comments.Find(id);
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            Comment searchedComment = db.Comments.Find(commentId);
+            Post searchedPost = db.Posts.Find(postId);
+            if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
+            {
+                return Unauthorized();
+            }
+
             db.Comments.Remove(searchedComment);
             db.SaveChanges();
+
             return RedirectToAction("Index");
         }
 
         public IActionResult EditPost(int id)
         {
+            var user = userManager.GetUserAsync(User).Result;
             PostViewModel viewModel = GetViewModel();
             viewModel.Post = db.Posts.Find(id);
+
+            if (viewModel.Post == null || viewModel.Post.PostOwnerId != user.Id)
+            {
+                return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
+            }
+
             return View(viewModel.Post);
         }
+
         [HttpPost]
         public IActionResult EditPost(Post editedPost, IFormFile? file)
         {
+            var user = userManager.GetUserAsync(User).Result;
+            var originalPost = db.Posts.AsNoTracking().FirstOrDefault(p => p.PostId == editedPost.PostId);
+
+            if (originalPost == null || originalPost.PostOwnerId != user.Id)
+            {
+                return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
+            }
+
             if (ModelState.IsValid)
             {
-                //Uploaded an new image
+                // Uploaded a new image
                 if (file != null)
                 {
                     string wwwRootPath = webHostEnvironment.WebRootPath;
                     string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\posts");
-                    //Delete existing image
+                    // Delete existing image
                     if (editedPost.ImageURL != null)
                     {
                         string oldImagePath = Path.Combine(wwwRootPath, editedPost.ImageURL.TrimStart('\\'));
                         System.IO.File.Delete(oldImagePath);
                     }
-                    //Save new image
+                    // Save new image
                     using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                     {
                         file.CopyTo(s);
@@ -122,13 +172,15 @@ namespace SocialMedia_App.Areas.User.Controllers
                 }
 
                 editedPost.DatePosted = DateTime.Now;
+                editedPost.PostOwnerId = user.Id;
+
                 db.Posts.Update(editedPost);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             return View("EditPost", editedPost);
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

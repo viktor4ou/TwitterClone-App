@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240930084817_ExtendCommentAndPostDb")]
+    partial class ExtendCommentAndPostDb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,9 +267,9 @@ namespace SocialMedia.Data.Migrations
                         new
                         {
                             CommentId = 1,
-                            CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b",
+                            CommentOwnerId = "swgfsdfg",
                             Content = "First Comment",
-                            DatePosted = new DateTime(2024, 9, 30, 21, 23, 40, 964, DateTimeKind.Local).AddTicks(2090),
+                            DatePosted = new DateTime(2024, 9, 30, 11, 48, 15, 981, DateTimeKind.Local).AddTicks(6510),
                             PostId = 1
                         });
                 });
@@ -306,9 +309,9 @@ namespace SocialMedia.Data.Migrations
                         {
                             PostId = 1,
                             Content = "First Post",
-                            DatePosted = new DateTime(2024, 9, 30, 21, 23, 40, 964, DateTimeKind.Local).AddTicks(1853),
+                            DatePosted = new DateTime(2024, 9, 30, 11, 48, 15, 981, DateTimeKind.Local).AddTicks(6208),
                             Likes = 0,
-                            PostOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b"
+                            PostOwnerId = "swgfsdfg"
                         });
                 });
 

@@ -22,5 +22,7 @@ namespace SocialMedia.Models.Models
         [NotMapped]
         [ValidateNever]
         public string TimeAgo { get; set; } = string.Empty;
+        [ValidateNever]
+        public string CommentOwnerId { get; set; }
     }
 }
