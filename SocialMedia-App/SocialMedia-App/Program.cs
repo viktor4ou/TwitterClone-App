@@ -19,6 +19,8 @@ namespace SocialMedia_App
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>
                 {
                     options.Lockout.AllowedForNewUsers = false; // Disable account lockout
+                    options.User.RequireUniqueEmail = true;
+
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddUserManager<CustomUserManager>();
