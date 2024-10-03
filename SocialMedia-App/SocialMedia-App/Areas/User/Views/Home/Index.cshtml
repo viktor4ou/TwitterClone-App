@@ -65,10 +65,12 @@
                         <!--Like and comment buttons-->
                         <div class="container">
                             @post.Likes
-                            <button class="btn btn-like me-3">
-                                <i class="bi bi-hand-thumbs-up me-2"></i>Like
-                                <!-- TODO: Create post request and handle it in the controller-->
-                            </button>
+                            <form method="post">
+                                <button class="btn btn-like me-3" type="submit" asp-controller="Home" asp-action="LikePost" asp-area="User" asp-route-postId="@post.PostId" >
+                                    <i class="bi bi-hand-thumbs-up me-2"></i>Like
+                                    <!-- TODO: Create post request and handle it in the controller-->
+                                </button>
+                            </form>
                             <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
                                 <i class="bi bi-chat"></i> Comment
                             </button>
