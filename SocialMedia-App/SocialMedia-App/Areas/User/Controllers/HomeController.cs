@@ -33,7 +33,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)// TODO: rename to CreatePost ,add image functionality 
+        public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -181,6 +181,35 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
             return View("EditPost", editedPost);
         }
+        [HttpPost]
+        public IActionResult LikePost(int postId)
+        {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            var post = db.Posts.Find(postId);
+            var like = db.Likes.FirstOrDefault(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
+
+            if (like == null)
+            {
+                like = new Like
+                {
+                    PostId = postId,
+                    LikeOwnerId = currentLoggedUser.Id
+                };
+                db.Likes.Add(like);
+                post.Likes++;
+            }
+            else
+            {
+                db.Likes.Remove(like);
+                post.Likes--;
+            }
+
+            db.Posts.Update(post);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -194,7 +223,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 Post = new Post(),
                 Posts = db.Posts.ToList(),
                 Comment = new Comment(),
-                Comments = db.Comments.ToList()
+                Comments = db.Comments.ToList(),
+                Like = new Like()
             };
             foreach (var post in viewModel.Posts)
             {
