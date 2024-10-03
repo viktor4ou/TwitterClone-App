@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241003175635_ChangeLikeIdType")]
+    partial class ChangeLikeIdType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,7 +269,7 @@ namespace SocialMedia.Data.Migrations
                             CommentId = 1,
                             CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b",
                             Content = "First Comment",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3587),
+                            DatePosted = new DateTime(2024, 10, 3, 20, 56, 34, 629, DateTimeKind.Local).AddTicks(8847),
                             PostId = 1
                         });
                 });
@@ -326,7 +329,7 @@ namespace SocialMedia.Data.Migrations
                         {
                             PostId = 1,
                             Content = "First Post",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3397),
+                            DatePosted = new DateTime(2024, 10, 3, 20, 56, 34, 629, DateTimeKind.Local).AddTicks(8658),
                             Likes = 0,
                             PostOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b"
                         });

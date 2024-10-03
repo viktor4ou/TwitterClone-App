@@ -10,8 +10,9 @@ namespace SocialMedia.Models.Models
 {
     public class Like
     {
+        
         [Key]
-        public string LikeId { get; set; }
+        public int LikeId { get; set; }
         [ValidateNever]
         public int PostId { get; set; }
         [ValidateNever]

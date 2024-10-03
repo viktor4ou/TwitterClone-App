@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SocialMedia.Data.Data;
 
@@ -11,9 +12,11 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241002092125_CreateLikesTable")]
+    partial class CreateLikesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -266,25 +269,23 @@ namespace SocialMedia.Data.Migrations
                             CommentId = 1,
                             CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b",
                             Content = "First Comment",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3587),
+                            DatePosted = new DateTime(2024, 10, 2, 12, 21, 24, 531, DateTimeKind.Local).AddTicks(8857),
                             PostId = 1
                         });
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.Like", b =>
                 {
-                    b.Property<int>("LikeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
+                    b.Property<string>("LikeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LikeOwnerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
+                    b.Property<string>("PostId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("LikeId");
 
@@ -326,7 +327,7 @@ namespace SocialMedia.Data.Migrations
                         {
                             PostId = 1,
                             Content = "First Post",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3397),
+                            DatePosted = new DateTime(2024, 10, 2, 12, 21, 24, 531, DateTimeKind.Local).AddTicks(8612),
                             Likes = 0,
                             PostOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b"
                         });
