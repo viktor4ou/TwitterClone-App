@@ -29,7 +29,10 @@ namespace SocialMedia.Data.Data
             modelBuilder.Entity<Comment>().HasData(
                 new Comment { CommentId = 1, Content = "First Comment", DatePosted = DateTime.Now, PostId = 1, CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b" }
             );
+            modelBuilder.Entity<Like>().HasData(
+                new Like { LikeId = 1, LikeOwnerId = "39d51659-850f-4b35-a13f-a8ab344e2cda", PostId = 1051 }
+            );
         }
-        
+
     }
 }
