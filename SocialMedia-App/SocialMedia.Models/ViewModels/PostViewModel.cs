@@ -21,6 +21,8 @@ namespace SocialMedia.Models.ViewModels
         public Post Post { get; set; }
         [ValidateNever]
         public Comment Comment { get; set; }
+
+        public List<Like> Likes = new();
         public List<Post> Posts = new();
         public List<Comment> Comments = new();
     }
