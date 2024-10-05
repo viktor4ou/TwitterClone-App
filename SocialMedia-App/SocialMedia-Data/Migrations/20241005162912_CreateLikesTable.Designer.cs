@@ -12,8 +12,8 @@ using SocialMedia.Data.Data;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241003181415_pisnami")]
-    partial class pisnami
+    [Migration("20241005162912_CreateLikesTable")]
+    partial class CreateLikesTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -269,18 +269,15 @@ namespace SocialMedia.Data.Migrations
                             CommentId = 1,
                             CommentOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b",
                             Content = "First Comment",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3587),
+                            DatePosted = new DateTime(2024, 10, 5, 19, 29, 11, 621, DateTimeKind.Local).AddTicks(9201),
                             PostId = 1
                         });
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.Like", b =>
                 {
-                    b.Property<int>("LikeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LikeId"));
+                    b.Property<string>("LikeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LikeOwnerId")
                         .IsRequired()
@@ -329,7 +326,7 @@ namespace SocialMedia.Data.Migrations
                         {
                             PostId = 1,
                             Content = "First Post",
-                            DatePosted = new DateTime(2024, 10, 3, 21, 14, 15, 200, DateTimeKind.Local).AddTicks(3397),
+                            DatePosted = new DateTime(2024, 10, 5, 19, 29, 11, 621, DateTimeKind.Local).AddTicks(9017),
                             Likes = 0,
                             PostOwnerId = "611a46b0-33d0-4609-b43d-f2b47617792b"
                         });

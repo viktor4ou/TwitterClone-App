@@ -192,6 +192,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             {
                 like = new Like
                 {
+                    LikeId = Guid.NewGuid().ToString(),
                     PostId = postId,
                     LikeOwnerId = currentLoggedUser.Id
                 };
@@ -224,7 +225,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 Posts = db.Posts.ToList(),
                 Comment = new Comment(),
                 Comments = db.Comments.ToList(),
-                Like = new Like()
+                Like = new Like(),
+                Likes = db.Likes.ToList()
             };
             foreach (var post in viewModel.Posts)
             {
