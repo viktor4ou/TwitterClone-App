@@ -225,7 +225,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 Posts = db.Posts.ToList(),
                 Comment = new Comment(),
                 Comments = db.Comments.ToList(),
-                Like = new Like()
+                Like = new Like(),
+                Likes = db.Likes.ToList()
             };
             foreach (var post in viewModel.Posts)
             {
