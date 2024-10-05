@@ -63,17 +63,37 @@
                 <div class="post-footer">
                     <div class="container">
                         <!--Like and comment buttons-->
-                        <div class="container">
-                            @post.Likes
-                            <form method="post">
-                                <button class="btn btn-like me-3" type="submit" asp-controller="Home" asp-action="LikePost" asp-area="User" asp-route-postId="@post.PostId" >
-                                    <i class="bi bi-hand-thumbs-up me-2"></i>Like
-                                    <!-- TODO: Create post request and handle it in the controller-->
+                        <div class="d-flex align-items-center">
+                            <h6 class="me-2  mb-1">@post.Likes</h6>
+                            @if (currentUser != null)
+                            {
+                                var like = Model.Likes.FirstOrDefault(l => l.PostId == post.PostId && l.LikeOwnerId == currentUser.Id);
+                                <form method="post">
+                                    <button class="btn btn-like me-3" type="submit" asp-controller="Home" asp-action="LikePost" asp-area="User" asp-route-postId="@post.PostId">
+                                        @if (like != null)
+                                        {
+                                            <i class="bi bi-heart-fill" style="color: red;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-heart"></i>                                            
+                                        }
+                                    </button>
+                                </form>
+                                <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
+                                    <i class="bi bi-chat"></i> Comment
                                 </button>
-                            </form>
-                            <button class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
-                                <i class="bi bi-chat"></i> Comment
-                            </button>
+                            }
+                            else
+                            {
+                                <button disabled="disabled" class="btn btn-like me-3">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                                <button disabled class="btn btn-comment" data-bs-toggle="collapse" data-bs-target="#commentForm-@post.PostId" aria-expanded="false" aria-controls="commentForm-@post.PostId">
+                                    <i class="bi bi-chat"></i> Comment
+                                </button>
+                            }
+                            
                         </div>
                         <!--Comment form-->
                         @if (SignInManager.IsSignedIn(User))
