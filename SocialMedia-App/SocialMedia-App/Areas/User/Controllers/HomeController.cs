@@ -192,6 +192,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             {
                 like = new Like
                 {
+                    LikeId = Guid.NewGuid().ToString(),
                     PostId = postId,
                     LikeOwnerId = currentLoggedUser.Id
                 };
