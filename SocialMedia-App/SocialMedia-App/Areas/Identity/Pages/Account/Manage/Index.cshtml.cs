@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,13 +18,16 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
     {
         private readonly CustomUserManager _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public IndexModel(
             CustomUserManager userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
         }
         public string Email { get; set; }
         public string Username { get; set; }
@@ -84,6 +88,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
+            //TODO:add change profile picture functionality
             var user = await _userManager.GetUserAsync(User) as ApplicationUser;
             if (user == null)
             {
@@ -129,6 +134,25 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            var profileImage = await _userManager.GetImageURLAsync(user);
+            if (Input.ProfileImage != null)
+            {
+                string filename;
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                string productPath = Path.Combine(wwwRootPath, @"images\profile");
+                string oldImagePath = wwwRootPath + profileImage;
+                //delete old image
+                System.IO.File.Delete(oldImagePath);
+
+                //save the new image 
+                filename = Guid.NewGuid() + Path.GetExtension(Input.ProfileImage.FileName);
+
+                using (FileStream stream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
+                {
+                    Input.ProfileImage.CopyTo(stream);
+                }
+                await _userManager.SetProfileImageURLAsync(user, filename);
+            }
             var lastName = await _userManager.GetLastNameAsync(user);
             if (Input.LastName != lastName)
             {

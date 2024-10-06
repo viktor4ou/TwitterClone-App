@@ -35,6 +35,17 @@ namespace SocialMedia.Models.Models
             user.LastName = lastName;
             return await UpdateAsync(user);
         }
+
+        public async Task<IdentityResult> SetProfileImageURLAsync(ApplicationUser user, string filename)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            user.ProfileImageURL = Path.Combine(@"\images\profile", filename);
+            return await UpdateAsync(user);
+        }
         public async Task<string> GetFirstNameAsync(ApplicationUser user)
         {
             return user.FirstName;
