@@ -136,8 +136,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
 
             var profileImage = await _userManager.GetImageURLAsync(user);
             if (Input.ProfileImage != null)
-            {
-                string filename;
+            {  
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 string productPath = Path.Combine(wwwRootPath, @"images\profile");
                 string oldImagePath = wwwRootPath + profileImage;
@@ -145,7 +144,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
                 System.IO.File.Delete(oldImagePath);
 
                 //save the new image 
-                filename = Guid.NewGuid() + Path.GetExtension(Input.ProfileImage.FileName);
+                string filename = Guid.NewGuid() + Path.GetExtension(Input.ProfileImage.FileName);
 
                 using (FileStream stream = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                 {
