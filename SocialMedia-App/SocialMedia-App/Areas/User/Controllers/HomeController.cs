@@ -66,7 +66,6 @@ namespace SocialMedia_App.Areas.User.Controllers
             return View("Index", postVM);
         }
 
-
         [HttpPost]
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
@@ -80,7 +79,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             db.SaveChanges();
 
             return RedirectToAction("Index");
-            //How to make it to just load the comment without refreshing the page like in a real time chat
+            //How to make it to just load the comment without refreshing the page like in react
         }
 
         public IActionResult DeletePost(int id)
@@ -94,6 +93,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
+
             // Delete existing image
             if (searchedPost.ImageURL != null)
             {
@@ -101,17 +101,21 @@ namespace SocialMedia_App.Areas.User.Controllers
                 string imageFullPath = Path.Combine(wwwRootPath, searchedPost.ImageURL.TrimStart('\\'));
                 System.IO.File.Delete(imageFullPath);
             }
+
             db.Posts.Remove(searchedPost);
             db.Comments.RemoveRange(postComments);
             db.SaveChanges();
+
             return RedirectToAction("Index");
         }
 
         public IActionResult DeleteComment(int commentId, int postId)
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+
             Comment searchedComment = db.Comments.Find(commentId);
             Post searchedPost = db.Posts.Find(postId);
+
             if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
             {
                 return Unauthorized();
@@ -125,11 +129,12 @@ namespace SocialMedia_App.Areas.User.Controllers
 
         public IActionResult EditPost(int id)
         {
-            var user = userManager.GetUserAsync(User).Result;
+            var currentLoggedUser = userManager.GetUserAsync(User).Result;
+
             PostViewModel viewModel = GetViewModel();
             viewModel.Post = db.Posts.Find(id);
 
-            if (viewModel.Post == null || viewModel.Post.PostOwnerId != user.Id)
+            if (viewModel.Post == null || viewModel.Post.PostOwnerId != currentLoggedUser.Id)
             {
                 return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
             }
@@ -140,10 +145,10 @@ namespace SocialMedia_App.Areas.User.Controllers
         [HttpPost]
         public IActionResult EditPost(Post editedPost, IFormFile? file)
         {
-            var user = userManager.GetUserAsync(User).Result;
+            var currentLoggedUser = userManager.GetUserAsync(User).Result;
             var originalPost = db.Posts.AsNoTracking().FirstOrDefault(p => p.PostId == editedPost.PostId);
 
-            if (originalPost == null || originalPost.PostOwnerId != user.Id)
+            if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
             {
                 return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
             }
@@ -156,12 +161,14 @@ namespace SocialMedia_App.Areas.User.Controllers
                     string wwwRootPath = webHostEnvironment.WebRootPath;
                     string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string productPath = Path.Combine(wwwRootPath, @"images\posts");
+
                     // Delete existing image
                     if (editedPost.ImageURL != null)
                     {
                         string oldImagePath = Path.Combine(wwwRootPath, editedPost.ImageURL.TrimStart('\\'));
                         System.IO.File.Delete(oldImagePath);
                     }
+
                     // Save new image
                     using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                     {
@@ -172,7 +179,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 }
 
                 editedPost.DatePosted = DateTime.Now;
-                editedPost.PostOwnerId = user.Id;
+                editedPost.PostOwnerId = currentLoggedUser.Id;
 
                 db.Posts.Update(editedPost);
                 db.SaveChanges();
@@ -190,12 +197,7 @@ namespace SocialMedia_App.Areas.User.Controllers
 
             if (like == null)
             {
-                like = new Like
-                {
-                    LikeId = Guid.NewGuid().ToString(),
-                    PostId = postId,
-                    LikeOwnerId = currentLoggedUser.Id
-                };
+                like = new Like(postId, currentLoggedUser.Id);
                 db.Likes.Add(like);
                 post.Likes++;
             }
