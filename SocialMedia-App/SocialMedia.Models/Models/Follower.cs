@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Models.Models
 {
-    class Follower
+    public class Follower
     {
         [Key]
         public string FollowerId { get; set; }
 
-        public string UserId { get; set; }
+        public string FollowOwnerId { get; set; }   
         public string FollowedUserId { get; set; }
     }
 }
