@@ -12,7 +12,7 @@ namespace SocialMedia.Models.Models
         [Key]
         public string FollowerId { get; set; }
 
-        public string  UserId { get; set; }
+        public string UserId { get; set; }
         public string FollowedUserId { get; set; }
     }
 }

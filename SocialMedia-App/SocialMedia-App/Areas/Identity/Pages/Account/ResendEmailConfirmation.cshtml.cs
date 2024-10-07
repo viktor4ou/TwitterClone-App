@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-
+using System.Net.Mail;
 namespace SocialMedia_App.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -28,23 +28,11 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        
-        
-
-
         [BindProperty]
         public InputModel Input { get; set; }
 
-        
-        
-
-
         public class InputModel
         {
-            
-            
-    
-    
             [Required]
             [EmailAddress]
             public string Email { get; set; }
