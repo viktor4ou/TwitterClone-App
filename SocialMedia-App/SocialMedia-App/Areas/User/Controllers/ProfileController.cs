@@ -37,7 +37,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 profileVM.FristName = _customUserManager.GetFirstNameAsync(user as ApplicationUser).Result;
                 profileVM.LastName = _customUserManager.GetLastNameAsync(user as ApplicationUser).Result;
                 profileVM.ProfilePictureURL = _customUserManager.GetImageURLAsync(user as ApplicationUser).Result;
-                profileVM.Followers = _customUserManager.GetFollowersCountAsync(user as ApplicationUser).Result;
+                profileVM.FollowersCount = _customUserManager.GetFollowersCountAsync(user as ApplicationUser).Result;
                 profileVM.Following = _customUserManager.GetFollowingCountAsync(user as ApplicationUser).Result;
                 profileVM.Posts = _db.Posts.Where(i => i.PostOwnerId == user.Id).ToList();
             }
