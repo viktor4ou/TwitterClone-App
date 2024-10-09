@@ -258,7 +258,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("CommentId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
 
                     b.HasData(
                         new
@@ -286,7 +286,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("FollowerId");
 
-                    b.ToTable("Followers");
+                    b.ToTable("Followers", (string)null);
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.Like", b =>
@@ -303,7 +303,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("LikeId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.Post", b =>
@@ -334,7 +334,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.HasKey("PostId");
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
 
                     b.HasData(
                         new
