@@ -94,3 +94,25 @@ body {
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.input-group {
+    border-top: 1px solid #dee2e6;
+}
+
+.chatList {
+    overflow-y: auto;
+    max-height: 650px;
+}
+.chatMessagesList {
+    overflow-y: auto;
+    max-height: 600px;
+}
