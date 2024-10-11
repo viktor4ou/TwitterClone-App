@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using Microsoft.AspNetCore.Identity;
+using SocialMedia.Models.Hubs;
 using SocialMedia.Models.Models;
 
 namespace SocialMedia_App
@@ -16,6 +17,7 @@ namespace SocialMedia_App
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddRazorPages();
+            builder.Services.AddSignalR();
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>
                 {
                     options.Lockout.AllowedForNewUsers = false; // Disable account lockout
@@ -44,7 +46,7 @@ namespace SocialMedia_App
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
-
+            app.MapHub<ChatHub>("/chat");
             app.Run();
         }
     }
