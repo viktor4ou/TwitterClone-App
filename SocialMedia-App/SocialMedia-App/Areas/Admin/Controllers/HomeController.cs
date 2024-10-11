@@ -36,14 +36,14 @@ namespace SocialMedia_App.Areas.Admin.Controllers
                 {
                     string wwwRootPath = webHostEnvironment.WebRootPath;
                     string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\posts");
+                    string productPath = Path.Combine(wwwRootPath, "images", "profile");
 
                     using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
                     {
                         file.CopyTo(s);
                     }
 
-                    postVM.Post.ImageURL = @"\images\posts\" + filename;
+                    postVM.Post.ImageURL = Path.Combine("images","posts",filename);
                 }
 
                 postVM.Post.DatePosted = DateTime.Now;
@@ -105,7 +105,7 @@ namespace SocialMedia_App.Areas.Admin.Controllers
                 {
                     string wwwRootPath = webHostEnvironment.WebRootPath;
                     string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\posts");
+                    string productPath = Path.Combine(wwwRootPath, "images", "posts");
                     //Delete existing image
                     if (editedPost.ImageURL != null)
                     {

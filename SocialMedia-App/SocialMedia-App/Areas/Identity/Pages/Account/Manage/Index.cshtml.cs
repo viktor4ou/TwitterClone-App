@@ -136,10 +136,10 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
 
             var profileImage = await _userManager.GetImageURLAsync(user);
             if (Input.ProfileImage != null)
-            {  
+            {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
-                string productPath = Path.Combine(wwwRootPath, @"images\profile");
-                string oldImagePath = wwwRootPath + profileImage;
+                string productPath = Path.Combine(wwwRootPath, "images", "profile");
+                string oldImagePath = Path.Combine(wwwRootPath, profileImage);
                 //delete old image
                 System.IO.File.Delete(oldImagePath);
 

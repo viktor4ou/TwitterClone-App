@@ -1,45 +1,70 @@
 ﻿@page
-<div class="container">
-    <div class="row p-1">
-        <div class="col-1">Message</div>
-        <div class="col-5"><input type="text" class="w-100" id="messageInput" /></div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6 text-end">
-        </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <hr />
-        </div>
-    </div>
-    <div class="row p-1">
-        <div class="col-6">
-            <ul id="messagesList"></ul>
-        </div>
-    </div>
-</div>
 
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Chat Room</h3>
+
+<div class="container-sm border my-3 vh-100 bg-white">
+    <div class="row h-100">
+        <!-- Chat List Section (Collapsible) -->
+        <div class="col-md-3 collapse d-md-block border-end" id="chatList">
+            <div class="row">
+                <div class="col-12 p-3 border-bottom">
+                    <span>Contacts</span>
                 </div>
-                <div class="card-body chat-container" id="chat-messages">
-                    <!-- Chat messages will be displayed here -->
-                    <div class="mb-2">
-                        <ul id="messagesList"></ul>
+            </div>
+            <!-- Chat List Items -->
+            <div class="list-group list-group-flush chatList">
+                <a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
+                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
+                    <div>
+                        <div class="fw-bold">John</div>
+                        <div>Doe</div>
+                    </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
+                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
+                    <div>
+                        <div class="fw-bold">John</div>
+                        <div>Doe</div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="col-12 col-md-9 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <!-- Three-dot button for small screens -->
+                <button class="btn btn-outline-secondary d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#chatList" aria-expanded="false" aria-controls="chatList">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+
+                <div id="selectedChatInfo" class="d-flex align-items-center">
+                    <!-- Placeholder for dynamic chat info -->
+                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
+                    <div>
+                        <div class="fw-bold" id="chatName">FirstName LastName</div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <input type="text" class="w-100" id="messageInput" />
-                    <input type="button" class="btn btn-success" id="sendButton" value="Send Message"/>
+
+                <div class="info-icon">
+                    <i class="bi bi-info-circle"></i>
                 </div>
+            </div>
+
+            <!-- Message Section (This is the dynamic area for chat messages) -->
+            <div class="flex-grow-1 p-3 overflow-auto chatMessagesList">
+                <!-- Chat messages will go here -->
+                <div class="container text-success" id="messagesList"></div>
+            </div>
+
+            <!-- Message Input Section (Fixed at the bottom) -->
+            <div class="input-group p-3 border-top">
+                <input type="text" class="form-control" placeholder="Enter a message" id="messageInput"/>
+                <button class="btn btn-primary form-switch" type="button" id="sendButton"><i class="bi bi-arrow-right"></i></button>
             </div>
         </div>
     </div>
 </div>
+
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>
