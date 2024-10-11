@@ -21,6 +21,12 @@ namespace SocialMedia_App.Areas.User.Controllers
         [HttpGet]
         public IActionResult Index()
         {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            if (currentLoggedUser is null)
+            {
+                return Unauthorized();
+                //Redirect to an custom error page 
+            }
             return View();
         }
     }
