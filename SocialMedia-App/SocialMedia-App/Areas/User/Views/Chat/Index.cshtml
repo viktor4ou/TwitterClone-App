@@ -26,11 +26,15 @@
                         <div>Doe</div>
                     </div>
                 </a>
-
+                <!--TODO and when we click on the all chat card we want to round the FriendId into post action method-->
+                <!--TODO and then we get the user my id and send it to the FriendViewmodel-->
+                <!--TODO after that in the partialviewmodel about chat proeperties we are gone display the user info-->
+                <!--TODO add friend model with FriendshipOenerId-->
             </div>
         </div>
 
         <!-- Chat Section -->
+        <!--TODO Make this a partial view that accept user (friend) -->
         <div class="col-12 col-md-9 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                 <!-- Three-dot button for small screens -->
@@ -50,10 +54,12 @@
                     <i class="bi bi-info-circle"></i>
                 </div>
             </div>
-
             <!-- Message Section (This is the dynamic area for chat messages) -->
             <div class="flex-grow-1 p-3 overflow-auto chatMessagesList">
                 <!-- Chat messages will go here -->
+                <!--TODO dont even need that, because we are gone display messages from the database-->
+                <!--TODO here is gone be foreach and we get messages for curretuserid and friendid-->
+
                 <div class="container text-success" id="messagesList"></div>
             </div>
 
