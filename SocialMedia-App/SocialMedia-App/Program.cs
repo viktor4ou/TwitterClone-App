@@ -42,9 +42,9 @@ namespace SocialMedia_App
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseWebSockets();
             app.MapControllerRoute(
-                name: "default",
+                name: "default",    
                 pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
             app.MapHub<ChatHub>("/chat");
             app.Run();
