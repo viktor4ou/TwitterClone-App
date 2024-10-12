@@ -1,6 +1,6 @@
 ﻿"use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+var connection = new signalR.HubConnectionBuilder().withUrl("/chat", transport = signalR.HttpTransportType.WebSockets, skipNegotiation= true).build();
 
 //Disable the send button until connection is established.
 document.getElementById("sendButton").disabled = true;
