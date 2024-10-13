@@ -136,7 +136,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account
                     }
 
                     // Set the ProfileImageURL property
-                    user.ProfileImageURL = Path.Combine("images","profile", filename);
+                    user.ProfileImageURL = Path.Combine(@"\images\profile", filename);
 
                     // Update the user in the database
                     await _userManager.UpdateAsync(user);
