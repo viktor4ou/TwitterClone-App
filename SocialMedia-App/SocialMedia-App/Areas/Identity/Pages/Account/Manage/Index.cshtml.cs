@@ -141,7 +141,7 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
                 string productPath = Path.Combine(wwwRootPath, "images", "profile");
                 string oldImagePath = Path.Combine(wwwRootPath, profileImage);
                 //delete old image
-                System.IO.File.Delete(oldImagePath);
+                System.IO.File.Delete(oldImagePath.TrimStart('\\'));
 
                 //save the new image 
                 string filename = Guid.NewGuid() + Path.GetExtension(Input.ProfileImage.FileName);
