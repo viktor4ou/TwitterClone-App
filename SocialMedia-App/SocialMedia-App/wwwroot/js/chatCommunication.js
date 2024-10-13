@@ -3,7 +3,7 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
 
 //Disable the send button until connection is established.
 document.getElementById("sendButton").disabled = true;
-var test = 1;
+var test = 123;
 connection.on("ReceiveMessage", function (user, message) {
     var div = document.createElement("div");
     div.className = "container bg-white rounded-pill border text-dark p-2 my-2 rounded";
