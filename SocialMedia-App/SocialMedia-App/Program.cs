@@ -46,7 +46,7 @@ namespace SocialMedia_App
             app.MapControllerRoute(
                 name: "default",    
                 pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
-            app.MapHub<ChatHub>("/chat");
+            app.MapHub<ChatHub>("/chatHub");
             app.Run();
         }
     }
