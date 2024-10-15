@@ -56,7 +56,7 @@
                     <p>@post.Content</p>
                     @if (!string.IsNullOrEmpty(post.ImageURL))
                     {
-                        <img src="@post.ImageURL" alt="Post Image" class="img-fluid" />
+                        <img src="@post.ImageURL" alt="Post Image" class="img-fluid"/>
                     }
                 </div>
                 <div class="post-footer">
@@ -75,7 +75,7 @@
                                         }
                                         else
                                         {
-                                            <i class="bi bi-heart"></i>                                            
+                                            <i class="bi bi-heart"></i>
                                         }
                                     </button>
                                 </form>
@@ -92,7 +92,7 @@
                                     <i class="bi bi-chat"></i> Comment
                                 </button>
                             }
-                            
+
                         </div>
                         <!--Comment form-->
                         @if (SignInManager.IsSignedIn(User))
@@ -100,8 +100,8 @@
                             <div class="collapse" id="commentForm-@post.PostId">
                                 <form method="post" asp-area="User" asp-controller="Home" asp-action="CreateComment" class="mt-2">
                                     <!--Returns the postId to the controller-->
-                                    <input type="hidden" name="postId" value="@post.PostId" />
-                                    <input type="hidden" asp-for="User.Id" />
+                                    <input type="hidden" name="postId" value="@post.PostId"/>
+                                    <input type="hidden" asp-for="User.Id"/>
                                     <div class="input-group mb-3">
                                         <input asp-for="@Model.Comment.Content" type="text" class="form-control" placeholder="Post your answer">
                                         <button class="btn btn-outline-info text-dark d-block" type="submit"><i class="bi bi-send"></i></button>
@@ -168,6 +168,100 @@
                 var createPostModal = new bootstrap.Modal(document.getElementById('CreatePostModal'));
                 createPostModal.show();
             }
+        });
+    </script>
+    <!--Search users-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var searchInput = $('#search-input');
+            var searchResults = $('#search-results');
+            var dropdownMenu = $('#search-dropdown');
+            var dropdown = new bootstrap.Dropdown(searchInput[0]);
+            var typingTimer;
+            var doneTypingInterval = 300;
+
+            searchInput.on('input', function() {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(performSearch, doneTypingInterval);
+            });
+
+            function performSearch() {
+                var query = searchInput.val();
+                if (query.length < 2) {
+                    searchResults.html('<li><span class="dropdown-item-text">Start typing to search...</span></li>');
+                    dropdown.hide();
+                    return;
+                }
+
+                $.ajax({
+                    url: 'User/Home/Search', // Make sure this URL is correct
+                    method: 'GET',
+                    data: { query: query },
+                    success: function(data) {
+                        searchResults.empty();
+                        if (data.length > 0) {
+                            data.forEach(function(username) {
+                                searchResults.append(
+                                    $('<li>').append(
+                                        $('<a>').addClass('dropdown-item')
+                                                .text(username)
+                                                .attr('href', '#')
+                                                .click(function(e) {
+                                                    e.preventDefault();
+                                                    searchInput.val(username);
+                                                    dropdown.hide();
+                                                    sendUserRequest(username.id);
+                                                })
+                                    )
+                                );
+                            });
+                        } else {
+                            searchResults.html('<li><span class="dropdown-item-text">No results found</span></li>');
+                        }
+                        dropdown.show();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Search request failed:", status, error);
+                        searchResults.html('<li><span class="dropdown-item-text">Error occurred while searching</span></li>');
+                        dropdown.show();
+                    }
+                });
+                function sendUserRequest(userId) {
+                    $.ajax({
+                        url: 'User/Profile/Index',
+                        method: 'GET',
+                        data: { id: userId },
+                        success: function(response) {
+                            // Handle the response from the server
+                            console.log("Profile request successful", response);
+                            // Dynamically redirect using the userId in the URL
+                            window.location.href = '/User/Profile?userId=' + userId;
+                            // Example: /User/Profile?userId=39d51659-850f-4b35-a13f-a8ab344e2cda
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Profile request failed:", status, error);
+                            // Handle error (e.g., show an error message to the user)
+                        }
+                    });
+                }
+
+                }
+            }
+
+            // Show dropdown when focusing on input
+            searchInput.on('focus', function() {
+                if (searchInput.val().length >= 2) {
+                    dropdown.show();
+                }
+            });
+
+            // Hide dropdown when clicking outside
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.dropdown').length) {
+                    dropdown.hide();
+                }
+            });
         });
     </script>
 }
