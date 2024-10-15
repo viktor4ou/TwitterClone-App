@@ -1,11 +1,17 @@
 ﻿@model SocialMedia.Models.ViewModels.ProfileViewModel
 
+@inject SignInManager<IdentityUser> signInManager
+@inject UserManager<IdentityUser> UserManager
 
+@{
+    var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
+}
 <div class="container my-5">
     <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
         <div class="col-auto d-flex align-items-center">
             <img class="rounded-circle" src="@Model.ProfilePictureURL" alt="Profile Picture" width="80" height="80">
         </div>
+       
         <div class="col">
             <h4 class="mb-0">@Model.FristName @Model.LastName</h4>
             <p class="text-muted mb-0">@@@Model.Username</p>
@@ -15,7 +21,24 @@
             </div>
         </div>
         <div class="col-auto d-flex align-items-center">
-            <button class="btn btn-primary btn-sm">Follow</button>
+            <!--Checks if the current user is the same as the user profile -->
+            @if (!(currentLoggedUser.Id == Model.UserID))
+            {
+                @if (@Model.Followers.Any(f => f.FollowOwnerId == currentLoggedUser.Id && f.FollowedUserId == @Model.UserID))
+                {
+                    <form asp-area="User" asp-controller="Profile" asp-action="Unfollow" method="post">
+                        <input type="hidden" name="userId" value="@Model.UserID" />
+                        <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-area="User" asp-controller="Profile" asp-action="Follow" method="post">
+                        <input type="hidden" name="userId" value="@Model.UserID" />
+                        <button type="submit" class="btn btn-success btn-sm">Follow</button>
+                    </form>
+                }
+            }
         </div>
     </div>
 
@@ -38,18 +61,21 @@
                             <h6 class="mb-0">@Model.FristName @Model.LastName</h6>
                             <small class="text-muted">@post.TimeAgo</small>
                         </div>
-                        <div class="dropdown me-2 ms-auto">
-                            <!--Button for post manipulation-->
-                            <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-three-dots"></i>
-                            </button>
-                            <!--Dropdown with all post manipulations-->
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
-                                <!--TODO:Add Edit post functionality-->
-                                <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
-                            </ul>
-                        </div>
+                        @if(currentLoggedUser.Id == Model.UserID)
+                        {
+                            <div class="dropdown me-2 ms-auto">
+                                <!--Button for post manipulation-->
+                                <button class="btn btn-sm " type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <!--Dropdown with all post manipulations-->
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
+                                    <!--TODO:Add Edit post functionality-->
+                                    <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
+                                </ul>
+                            </div>
+                        }
                     </div>
                 </div>
                 <div class="post-content">
