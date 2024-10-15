@@ -195,26 +195,33 @@
                 }
 
                 $.ajax({
-                    url: 'User/Home/Search', // Make sure this URL is correct
+                    url: 'User/Home/Search', // Ensure this URL is correct and matches your server endpoint
                     method: 'GET',
                     data: { query: query },
                     success: function(data) {
                         searchResults.empty();
                         if (data.length > 0) {
-                            data.forEach(function(username) {
-                                searchResults.append(
-                                    $('<li>').append(
-                                        $('<a>').addClass('dropdown-item')
-                                                .text(username)
-                                                .attr('href', '#')
-                                                .click(function(e) {
-                                                    e.preventDefault();
-                                                    searchInput.val(username);
-                                                    dropdown.hide();
-                                                    sendUserRequest(username.id);
-                                                })
-                                    )
-                                );
+                            data.forEach(function(user) {
+                                // Ensure 'id' and 'username' fields are being returned correctly from the server
+                                if (user.id && user.userName) { // Correct field names (case sensitive)
+                                    searchResults.append(
+                                        $('<li>').append(
+                                            $('<a>').addClass('dropdown-item')
+                                                    .text(user.userName) // Display username correctly
+                                                    .attr('href', '#')
+                                                    .data('userid', user.id) // Store user id as data attribute
+                                                    .click(function(e) {
+                                                        e.preventDefault();
+                                                        var userId = $(this).data('userid'); // Get the stored user id
+                                                        searchInput.val(user.userName); // Set the input value
+                                                        dropdown.hide();
+                                                        sendUserRequest(userId); // Pass userId to the function
+                                                    })
+                                        )
+                                    );
+                                } else {
+                                    console.error('User object missing id or username:', user);
+                                }
                             });
                         } else {
                             searchResults.html('<li><span class="dropdown-item-text">No results found</span></li>');
@@ -227,25 +234,15 @@
                         dropdown.show();
                     }
                 });
-                function sendUserRequest(userId) {
-                    $.ajax({
-                        url: 'User/Profile/Index',
-                        method: 'GET',
-                        data: { id: userId },
-                        success: function(response) {
-                            // Handle the response from the server
-                            console.log("Profile request successful", response);
-                            // Dynamically redirect using the userId in the URL
-                            window.location.href = '/User/Profile?userId=' + userId;
-                            // Example: /User/Profile?userId=39d51659-850f-4b35-a13f-a8ab344e2cda
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("Profile request failed:", status, error);
-                            // Handle error (e.g., show an error message to the user)
-                        }
-                    });
-                }
+            }
 
+            function sendUserRequest(userId) {
+                if (userId) {
+                    // Redirecting to the profile page using the `userId`
+                    window.location.href = '/User/Profile?userId=' + userId;
+                } else {
+                    console.error("Invalid userId passed to sendUserRequest:", userId);
+                }
             }
 
             // Show dropdown when focusing on input
@@ -256,12 +253,13 @@
             });
 
             // Hide dropdown when clicking outside
-            $(document).on('click', function (e) {
+            $(document).on('click', function(e) {
                 if (!$(e.target).closest('.dropdown').length) {
                     dropdown.hide();
                 }
             });
         });
+
     </script>
 }
 <!-- Create Post Modal -->
