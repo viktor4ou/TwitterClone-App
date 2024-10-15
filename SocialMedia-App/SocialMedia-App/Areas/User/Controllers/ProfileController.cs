@@ -14,7 +14,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly CustomUserManager _customUserManager;
 
         private readonly ApplicationDbContext _db;
-        public ProfileController(UserManager<IdentityUser> userManager, CustomUserManager customUserManager, ApplicationDbContext db,SignInManager<IdentityUser> signInManager)
+        public ProfileController(UserManager<IdentityUser> userManager, CustomUserManager customUserManager, ApplicationDbContext db, SignInManager<IdentityUser> signInManager)
         {
             _userManager = userManager;
             _customUserManager = customUserManager;
@@ -30,11 +30,67 @@ namespace SocialMedia_App.Areas.User.Controllers
             {
                 return Unauthorized();
             }
-
+            var searchedUser = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
+            if (searchedUser is null)
+            {
+                return BadRequest();
+            }
             ProfileViewModel profileVM = GetProfileViewModel(userId);
             return View(profileVM);
         }
+        [HttpPost]
+        public IActionResult Follow(string userId)
+        {
+            var currentLoggedUser = _signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
 
+            if (currentLoggedUser is null)
+            {
+                return Unauthorized();
+            }
+
+            var userToFollow = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
+            if (userToFollow != null)
+            {
+                Follower follower = new()
+                {
+                    FollowerId = Guid.NewGuid().ToString(),
+                    FollowOwnerId = currentLoggedUser.Id,
+                    FollowedUserId = userToFollow.Id
+                };
+
+                userToFollow.Followers++;
+                currentLoggedUser.Following++;
+                _db.Followers.Add(follower);
+                _db.SaveChanges();
+
+                return RedirectToAction("Index", new { userId = userId });
+            }
+
+            return Unauthorized();
+        }
+
+        public IActionResult Unfollow(string userId)
+        {
+            var currentLoggedUser = _signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
+            if (currentLoggedUser is null)
+            {
+                return Unauthorized();
+            }
+
+            var followToBeRemoved = _db.Followers.FirstOrDefault(f => 
+                f.FollowOwnerId == currentLoggedUser.Id && 
+                f.FollowedUserId == userId);
+            var userToUnfollow = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
+            if (followToBeRemoved is null)
+            {
+                return BadRequest();
+            }
+            currentLoggedUser.Following--;
+            userToUnfollow.Followers--;
+            _db.Followers.Remove(followToBeRemoved);
+            _db.SaveChanges();
+            return RedirectToAction("Index", new { userId = userId });
+        }
         private ProfileViewModel GetProfileViewModel(string userId)
         {
             ProfileViewModel profileVM = new();

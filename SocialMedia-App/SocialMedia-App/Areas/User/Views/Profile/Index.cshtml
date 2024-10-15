@@ -21,9 +21,23 @@
             </div>
         </div>
         <div class="col-auto d-flex align-items-center">
+            <!--Checks if the current user is the same as the user profile -->
             @if (!(currentLoggedUser.Id == Model.UserID))
             {
-                <button class="btn btn-primary btn-sm">Follow</button>
+                @if (@Model.Followers.Any(f => f.FollowOwnerId == currentLoggedUser.Id && f.FollowedUserId == @Model.UserID))
+                {
+                    <form asp-area="User" asp-controller="Profile" asp-action="Unfollow" method="post">
+                        <input type="hidden" name="userId" value="@Model.UserID" />
+                        <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-area="User" asp-controller="Profile" asp-action="Follow" method="post">
+                        <input type="hidden" name="userId" value="@Model.UserID" />
+                        <button type="submit" class="btn btn-success btn-sm">Follow</button>
+                    </form>
+                }
             }
         </div>
     </div>
