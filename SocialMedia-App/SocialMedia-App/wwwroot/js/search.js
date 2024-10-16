@@ -30,8 +30,22 @@
                         if (user.id && user.userName) {
                             searchResults.append(
                                 $('<li>').append(
-                                    $('<a>').addClass('dropdown-item')
-                                    .text(user.userName)
+                                    $('<a>').addClass('dropdown-item border')
+                                    .css({
+                                        'display': 'flex',
+                                        'align-items': 'center' // Vertically center the image and text
+                                    })
+                                    .append(
+                                        $('<img>').attr('src', user.profileImageURL).addClass('profile-img').css({
+                                            'width': '30px', // Set the image size as per your needs
+                                            'height': '30px',
+                                            'border-radius': '50%', // For circular image (optional)
+                                            'margin-right': '10px' // Add space between image and username
+                                        })
+                                    )
+                                    .append(
+                                        $('<span>').text(user.userName)
+                                    )
                                     .attr('href', '#')
                                     .data('userid', user.id)
                                     .click(function (e) {

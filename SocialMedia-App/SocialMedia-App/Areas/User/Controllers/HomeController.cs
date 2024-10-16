@@ -41,9 +41,9 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             // Select both UserName and Id to return to the client
-            var users = await db.Users
+            var users = await db.ApplicationUsers
                 .Where(u => u.UserName.Contains(query))
-                .Select(u => new { u.UserName, u.Id }) // Select both UserName and Id
+                .Select(u => new { u.UserName, u.Id,u.ProfileImageURL }) // Select both UserName and Id
                 .Take(10)
                 .ToListAsync();
 
