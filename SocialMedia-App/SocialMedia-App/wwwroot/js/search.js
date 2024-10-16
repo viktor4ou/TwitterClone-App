@@ -33,14 +33,14 @@
                                     $('<a>').addClass('dropdown-item border')
                                     .css({
                                         'display': 'flex',
-                                        'align-items': 'center' // Vertically center the image and text
+                                        'align-items': 'center' 
                                     })
                                     .append(
                                         $('<img>').attr('src', user.profileImageURL).addClass('profile-img').css({
-                                            'width': '30px', // Set the image size as per your needs
+                                            'width': '30px', 
                                             'height': '30px',
-                                            'border-radius': '50%', // For circular image (optional)
-                                            'margin-right': '10px' // Add space between image and username
+                                            'border-radius': '50%', 
+                                            'margin-right': '10px' 
                                         })
                                     )
                                     .append(

@@ -1,59 +1,20 @@
 ﻿@page
 
+@model SocialMedia.Models.ViewModels.ChatViewModel
 
-<div class="container-sm border my-3 vh-100 bg-white">
+
+<div class="container-fluid border my-3 vh-100 bg-white">
     <div class="row h-100">
         <!-- Chat List Section (Collapsible) -->
         <div class="col-md-3 collapse d-md-block border-end" id="chatList">
             <div class="row">
                 <div class="col-12 p-3 border-bottom">
-                    <span>Contacts</span>
+                    <h3 class="text-center">Contacts</h3>
                 </div>
             </div>
             <!-- Chat List Items -->
             <div class="list-group list-group-flush chatList">
-                <a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a><a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a><a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a><a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a><a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="John Doe">
-                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
-                    <div>
-                        <div class="fw-bold">John</div>
-                        <div>Doe</div>
-                    </div>
-                </a>
-                <!--TODO and when we click on the all chat card we want to route the FriendId into post action method-->
-                <!--TODO and then we get the user my id and send it to the FriendViewmodel-->
-                <!--TODO after that in the partialviewmodel about chat proeperties we are gone display the user info-->
-                <!--TODO add friend model with FriendshipOenerId-->
+                <partial name="_ContactsPartial"/>
             </div>
         </div>
 
