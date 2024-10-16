@@ -1,0 +1,11 @@
+﻿@model SocialMedia.Models.ViewModels.ChatViewModel
+
+@foreach (var user in @Model.FollowedUsers)
+{
+    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center chat-item" data-chat-name="@user.FirstName @user.LastName">
+        <img src="@user.ProfileImageURL" class="avatar-circle bg-secondary rounded-circle me-3"/>
+        <div>
+            <p class="fw-bold text-break">@user.FirstName @user.LastName</p>
+        </div>
+    </a>
+}
