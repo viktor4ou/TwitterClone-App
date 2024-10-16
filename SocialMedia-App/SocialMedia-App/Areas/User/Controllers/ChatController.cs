@@ -13,6 +13,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly CustomUserManager customUserManager;
         private readonly ApplicationDbContext db;
+
         public ChatController(UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             CustomUserManager customUserManager,
@@ -23,14 +24,15 @@ namespace SocialMedia_App.Areas.User.Controllers
             this.customUserManager = customUserManager;
             this.db = db;
         }
+
         [HttpGet]
         public IActionResult Index()
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
             if (currentLoggedUser is null)
             {
-                return Unauthorized();
-                //Redirect to an custom error page 
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
             ChatViewModel chatViewModel = GetChatViewModel(currentLoggedUser.Id);
             return View(chatViewModel);
