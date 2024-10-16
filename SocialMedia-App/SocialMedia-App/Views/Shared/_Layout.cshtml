@@ -4,11 +4,19 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]EchoSocial</title>
+    <title>@ViewData["Title"] EchoSocial</title>
     @inject SignInManager<IdentityUser> SignInManager
+
+    <!-- Bootstrap and Custom CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="icon" type="image/x-icon" href="~/images/icon.png">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- jQuery (CDN or Local, but not both) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <header>
@@ -22,25 +30,40 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="User" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <!--TODO: check if user is logged IN -->
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="User" asp-controller="Chat" asp-action="Index">Chat</a>
                         </li>
-                    </ul>
-                    <ul class="navbar-nav ">
-                        <li class="nav-item">
-                            <partial name="_LoginPartial"/>
-                        </li>
+
+                        <!-- Search Bar -->
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-md-6">
+                                    <div class="dropdown">
+                                        <input type="text" id="search-input" class="form-control" placeholder="Search users..." data-bs-toggle="dropdown" aria-expanded="false">
+                                        <ul id="search-dropdown" class="dropdown-menu w-100 text-center" aria-labelledby="search-input">
+                                            <div id="search-results">
+                                            <li><span class="dropdown-item-text">Start typing to search...</span></li>
+                                    </div>
                     </ul>
                 </div>
             </div>
+            </div>
+            </div>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <partial name="_LoginPartial" />
+                </li>
+            </ul>
+            </div>
+            </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -52,10 +75,14 @@
             &copy; 2024 - EchoSocial
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- Load your custom JS files (in correct order) -->
+    <script src="~/js/search.js"></script>
+
+    <!-- Bootstrap JS Bundle (includes Popper.js) -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Render section for view-specific scripts -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

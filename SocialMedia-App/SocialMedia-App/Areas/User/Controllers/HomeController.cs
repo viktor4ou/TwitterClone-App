@@ -32,6 +32,24 @@ namespace SocialMedia_App.Areas.User.Controllers
             return View(viewModel);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return Json(new List<object>()); // Return an empty list if the query is empty
+            }
+
+            // Select both UserName and Id to return to the client
+            var users = await db.Users
+                .Where(u => u.UserName.Contains(query))
+                .Select(u => new { u.UserName, u.Id }) // Select both UserName and Id
+                .Take(10)
+                .ToListAsync();
+
+            return Json(users); // Return the list of users as JSON
+        }
+
         [HttpPost]
         public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)
         {
