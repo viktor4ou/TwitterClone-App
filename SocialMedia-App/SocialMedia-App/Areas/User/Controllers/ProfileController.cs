@@ -28,7 +28,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             var currentLoggedUser = _signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
             if (currentLoggedUser is null)
             {
-                return Unauthorized();
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
             var searchedUser = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
             if (searchedUser is null)
@@ -45,7 +46,8 @@ namespace SocialMedia_App.Areas.User.Controllers
 
             if (currentLoggedUser is null)
             {
-                return Unauthorized();
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
             var userToFollow = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
@@ -74,7 +76,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             var currentLoggedUser = _signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
             if (currentLoggedUser is null)
             {
-                return Unauthorized();
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
             var followToBeRemoved = _db.Followers.FirstOrDefault(f => 

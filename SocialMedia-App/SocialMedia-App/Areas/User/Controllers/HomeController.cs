@@ -35,6 +35,12 @@ namespace SocialMedia_App.Areas.User.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string query)
         {
+            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             if (string.IsNullOrWhiteSpace(query))
             {
                 return Json(new List<object>()); // Return an empty list if the query is empty
@@ -70,6 +76,12 @@ namespace SocialMedia_App.Areas.User.Controllers
 
                 var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
 
+                if (currentLoggedUser is null)
+                {
+                    TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                    return RedirectToAction("Login", "Account", new { area = "Identity" });
+                }
+
                 postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
 
@@ -87,6 +99,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult CreateComment(int postId, PostViewModel postVM)
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
 
             postVM.Comment.PostId = postId;
             postVM.Comment.DatePosted = DateTime.Now;
@@ -102,6 +119,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult DeletePost(int id)
         {
             var user = userManager.GetUserAsync(User).Result;
+            if (user is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             Post searchedPost = db.Posts.Find(id);
 
             if (searchedPost == null || searchedPost.PostOwnerId != user.Id)
@@ -129,7 +151,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult DeleteComment(int commentId, int postId)
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             Comment searchedComment = db.Comments.Find(commentId);
             Post searchedPost = db.Posts.Find(postId);
 
@@ -147,7 +173,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult EditPost(int id)
         {
             var currentLoggedUser = userManager.GetUserAsync(User).Result;
-
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             PostViewModel viewModel = GetViewModel();
             viewModel.Post = db.Posts.Find(id);
 
@@ -163,6 +193,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult EditPost(Post editedPost, IFormFile? file)
         {
             var currentLoggedUser = userManager.GetUserAsync(User).Result;
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             var originalPost = db.Posts.AsNoTracking().FirstOrDefault(p => p.PostId == editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
@@ -209,6 +244,11 @@ namespace SocialMedia_App.Areas.User.Controllers
         public IActionResult LikePost(int postId)
         {
             var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            if (currentLoggedUser is null)
+            {
+                TempData["ErrorMessage"] = "You need to log in to access this feature.";
+                return RedirectToAction("Login", "Account", new { area = "Identity" });
+            }
             var post = db.Posts.Find(postId);
             var like = db.Likes.FirstOrDefault(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
 
