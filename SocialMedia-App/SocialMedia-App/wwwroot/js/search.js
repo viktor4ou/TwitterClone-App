@@ -52,7 +52,7 @@
                                         e.preventDefault();
                                         var userId = $(this).data('userid');
                                         searchInput.val(user.userName);
-                                        dropdown.hide();
+                                        dropdown.hide();    
                                         sendUserRequest(userId);
                                     })
                                 )
