@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using SocialMedia.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using SocialMedia.Data.Interfaces;
+using SocialMedia.Data.Repository;
 
 namespace SocialMedia_App.Areas.User.Controllers
 {
@@ -16,9 +18,17 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
-        public HomeController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly IPostRepository postRepository;
+        private readonly ICommentRepository commentRepository;
+        public HomeController(ApplicationDbContext db,
+            IWebHostEnvironment webHostEnvironment,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IPostRepository postRepository,
+            ICommentRepository commentRepository)
         {
-
+            this.commentRepository = commentRepository;
+            this.postRepository = postRepository;
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
@@ -85,8 +95,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
 
-                db.Posts.Add(postVM.Post);
-                db.SaveChanges();
+                postRepository.Add(postVM.Post);
+                postRepository.Save();
 
                 return RedirectToAction("Index");
             }
@@ -124,7 +134,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
-            Post searchedPost = db.Posts.Find(id);
+
+            Post searchedPost = postRepository.GetPostById(id);
 
             if (searchedPost == null || searchedPost.PostOwnerId != user.Id)
             {
@@ -141,9 +152,9 @@ namespace SocialMedia_App.Areas.User.Controllers
                 System.IO.File.Delete(imageFullPath);
             }
 
-            db.Posts.Remove(searchedPost);
-            db.Comments.RemoveRange(postComments);
-            db.SaveChanges();
+            postRepository.Remove(searchedPost);
+            commentRepository.RemoveRange(postComments);
+            postRepository.Save();
 
             return RedirectToAction("Index");
         }
@@ -156,8 +167,9 @@ namespace SocialMedia_App.Areas.User.Controllers
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
+
             Comment searchedComment = db.Comments.Find(commentId);
-            Post searchedPost = db.Posts.Find(postId);
+            Post searchedPost = postRepository.GetPostById(postId);
 
             if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
             {
@@ -165,7 +177,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             db.Comments.Remove(searchedComment);
-            db.SaveChanges();
+            postRepository.Save();
 
             return RedirectToAction("Index");
         }
@@ -179,7 +191,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
             PostViewModel viewModel = GetViewModel();
-            viewModel.Post = db.Posts.Find(id);
+            viewModel.Post = postRepository.GetPostById(id);
 
             if (viewModel.Post == null || viewModel.Post.PostOwnerId != currentLoggedUser.Id)
             {
@@ -198,7 +210,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
-            var originalPost = db.Posts.AsNoTracking().FirstOrDefault(p => p.PostId == editedPost.PostId);
+            //TODO: Add into repo Func for search
+            var originalPost = db.Posts.FirstOrDefault(p => p.PostId == editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
             {
@@ -233,8 +246,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 editedPost.DatePosted = DateTime.Now;
                 editedPost.PostOwnerId = currentLoggedUser.Id;
 
-                db.Posts.Update(editedPost);
-                db.SaveChanges();
+                postRepository.Update(editedPost);
+                postRepository.Save();
 
                 return RedirectToAction("Index");
             }
@@ -249,7 +262,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
-            var post = db.Posts.Find(postId);
+
+            var post = postRepository.GetPostById(postId);
             var like = db.Likes.FirstOrDefault(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
 
             if (like == null)
@@ -264,8 +278,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 post.Likes--;
             }
 
-            db.Posts.Update(post);
-            db.SaveChanges();
+            postRepository.Update(post);
+            postRepository.Save();
 
             return RedirectToAction("Index");
         }
@@ -281,7 +295,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             var viewModel = new PostViewModel
             {
                 Post = new Post(),
-                Posts = db.Posts.ToList(),
+                Posts = postRepository.GetAll(),
                 Comment = new Comment(),
                 Comments = db.Comments.ToList(),
                 Like = new Like(),
