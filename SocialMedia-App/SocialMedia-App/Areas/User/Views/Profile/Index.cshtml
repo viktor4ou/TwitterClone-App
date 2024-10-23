@@ -28,20 +28,20 @@
                 {
                     <form asp-area="User" asp-controller="Profile" asp-action="Unfollow" method="post">
                         <input type="hidden" name="userId" value="@Model.UserID" />
-                        <button type="submit" class="btn btn-danger btn-sm">Unfollow</button>
+                        <button type="submit" class="btn btn-danger btn-sm" id="unfollow_btn">Unfollow</button>
                     </form>
                 }
                 else
                 {
-                    <form asp-area="User" asp-controller="Profile" asp-action="Follow" method="post">
+                    <form id="followForm">
                         <input type="hidden" name="userId" value="@Model.UserID" />
-                        <button type="submit" class="btn btn-success btn-sm">Follow</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="">Follow</button>
                     </form>
                 }
             }
         </div>
     </div>
-
+    <button type="submit" class="btn btn-success btn-sm" id="follow_btn">Follow</button>
     <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
         <div class="col-12">
             <h3 class="mb-3">My Posts</h3>
@@ -90,3 +90,5 @@
     </div>
 
 </div>
+
+<script src="~/js/follow.js"></script>
