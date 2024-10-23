@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Data;
+using SocialMedia.Data.Repository;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
 
@@ -12,13 +13,19 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly CustomUserManager _customUserManager;
+        private readonly FollowerRepository followerRepository;
+        private readonly PostRepository postRepository;
 
-        private readonly ApplicationDbContext _db;
-        public ProfileController(UserManager<IdentityUser> userManager, CustomUserManager customUserManager, ApplicationDbContext db, SignInManager<IdentityUser> signInManager)
+        public ProfileController(UserManager<IdentityUser> userManager,
+            CustomUserManager customUserManager,
+            SignInManager<IdentityUser> signInManager,
+            FollowerRepository followerRepository,
+            PostRepository postRepository)
         {
+            this.postRepository = postRepository;
+            this.followerRepository = followerRepository;
             _userManager = userManager;
             _customUserManager = customUserManager;
-            _db = db;
             _signInManager = signInManager;
         }
 
@@ -62,8 +69,8 @@ namespace SocialMedia_App.Areas.User.Controllers
 
                 userToFollow.Followers++;
                 currentLoggedUser.Following++;
-                _db.Followers.Add(follower);
-                _db.SaveChanges();
+                followerRepository.Add(follower);
+                followerRepository.Save();
 
                 return RedirectToAction("Index", new { userId = userId });
             }
@@ -80,8 +87,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
-            var followToBeRemoved = _db.Followers.FirstOrDefault(f => 
-                f.FollowOwnerId == currentLoggedUser.Id && 
+            var followToBeRemoved = followerRepository.GetBy(f =>
+                f.FollowOwnerId == currentLoggedUser.Id &&
                 f.FollowedUserId == userId);
             var userToUnfollow = _userManager.FindByIdAsync(userId).Result as ApplicationUser;
             if (followToBeRemoved is null)
@@ -90,8 +97,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
             currentLoggedUser.Following--;
             userToUnfollow.Followers--;
-            _db.Followers.Remove(followToBeRemoved);
-            _db.SaveChanges();
+            followerRepository.Remove(followToBeRemoved);
+            followerRepository.Save();
             return RedirectToAction("Index", new { userId = userId });
         }
         private ProfileViewModel GetProfileViewModel(string userId)
@@ -107,8 +114,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 profileVM.ProfilePictureURL = _customUserManager.GetImageURLAsync(user).Result;
                 profileVM.FollowersCount = _customUserManager.GetFollowersCountAsync(user).Result;
                 profileVM.Following = _customUserManager.GetFollowingCountAsync(user).Result;
-                profileVM.Followers = _db.Followers.ToList();
-                profileVM.Posts = _db.Posts.Where(i => i.PostOwnerId == user.Id).ToList();
+                profileVM.Followers = followerRepository.GetAll()
+                profileVM.Posts = postRepository.GetAllBy(i => i.PostOwnerId == user.Id);
             }
             return profileVM;
         }
