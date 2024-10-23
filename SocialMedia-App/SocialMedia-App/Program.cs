@@ -20,6 +20,7 @@ namespace SocialMedia_App
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection1")));
             builder.Services.AddScoped<IPostRepository, PostRepository>();
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<ILIkeRepository, LikeRepository>();
             builder.Services.AddRazorPages();
             builder.Services.AddSignalR();
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>

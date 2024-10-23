@@ -20,14 +20,18 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IPostRepository postRepository;
         private readonly ICommentRepository commentRepository;
+        private readonly ILIkeRepository likeRepository;
+
         public HomeController(ApplicationDbContext db,
             IWebHostEnvironment webHostEnvironment,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IPostRepository postRepository,
-            ICommentRepository commentRepository)
+            ICommentRepository commentRepository,
+            ILIkeRepository likeRepository)
         {
             this.commentRepository = commentRepository;
+            this.likeRepository = likeRepository;
             this.postRepository = postRepository;
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
@@ -119,8 +123,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             postVM.Comment.DatePosted = DateTime.Now;
             postVM.Comment.CommentOwnerId = currentLoggedUser.Id;
 
-            db.Comments.Add(postVM.Comment);
-            db.SaveChanges();
+            commentRepository.Add(postVM.Comment);
+            commentRepository.Save();
 
             return RedirectToAction("Index");
             //How to make it to just load the comment without refreshing the page like in react
@@ -142,7 +146,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
             }
 
-            List<Comment> postComments = db.Comments.Where(c => c.PostId == id).ToList();
+            List<Comment> postComments = commentRepository.GetAllBy(c => c.PostId == id);
 
             // Delete existing image
             if (searchedPost.ImageURL != null)
@@ -168,7 +172,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
 
-            Comment searchedComment = db.Comments.Find(commentId);
+            Comment searchedComment = commentRepository.GetById(commentId);
             Post searchedPost = postRepository.GetPostById(postId);
 
             if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
@@ -176,8 +180,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return Unauthorized();
             }
 
-            db.Comments.Remove(searchedComment);
-            postRepository.Save();
+            commentRepository.Remove(searchedComment);
+            commentRepository.Save();
 
             return RedirectToAction("Index");
         }
@@ -211,7 +215,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
             //TODO: Add into repo Func for search
-            var originalPost = db.Posts.FirstOrDefault(p => p.PostId == editedPost.PostId);
+            var originalPost = postRepository.GetBy(p => p.PostId == editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
             {
@@ -264,17 +268,17 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             var post = postRepository.GetPostById(postId);
-            var like = db.Likes.FirstOrDefault(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
+            var like = likeRepository.GetBy(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
 
             if (like == null)
             {
                 like = new Like(postId, currentLoggedUser.Id);
-                db.Likes.Add(like);
+                likeRepository.Add(like);
                 post.Likes++;
             }
             else
             {
-                db.Likes.Remove(like);
+                likeRepository.Remove(like);
                 post.Likes--;
             }
 
@@ -297,9 +301,9 @@ namespace SocialMedia_App.Areas.User.Controllers
                 Post = new Post(),
                 Posts = postRepository.GetAll(),
                 Comment = new Comment(),
-                Comments = db.Comments.ToList(),
+                Comments = commentRepository.GetAll(),
                 Like = new Like(),
-                Likes = db.Likes.ToList()
+                Likes = likeRepository.GetAll()
             };
             foreach (var post in viewModel.Posts)
             {

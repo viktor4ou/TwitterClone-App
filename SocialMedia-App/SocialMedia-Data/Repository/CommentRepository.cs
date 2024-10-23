@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using SocialMedia.Data.Data;
@@ -19,7 +20,7 @@ namespace SocialMedia.Data.Repository
 
         public Comment GetById(int commentId)
         {
-            dbSet.Find()
+            return dbSet.FirstOrDefault(x=>x.CommentId == commentId);
         }
 
         public void RemoveRange(List<Comment> comments)
