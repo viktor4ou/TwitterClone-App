@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,19 @@ namespace SocialMedia.Data.Repository
         public void Save()
         {
             db.SaveChanges();
+        }
+
+        public T GetBy(Expression<Func<T, bool>> expression)
+        {
+            IQueryable<T> query = dbSet;
+            query = query.Where(expression);
+            return query.FirstOrDefault();
+        }
+        public List<T> GetAllBy(Expression<Func<T, bool>> expression)
+        {
+            IQueryable<T> query = dbSet;
+            query = query.Where(expression);
+            return query.ToList();
         }
     }
 }
