@@ -21,18 +21,21 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly IPostRepository postRepository;
         private readonly ICommentRepository commentRepository;
         private readonly ILIkeRepository likeRepository;
-
+        private readonly IUserRepository userRepository;
+        
         public HomeController(ApplicationDbContext db,
             IWebHostEnvironment webHostEnvironment,
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             IPostRepository postRepository,
             ICommentRepository commentRepository,
-            ILIkeRepository likeRepository)
+            ILIkeRepository likeRepository,
+            IUserRepository userRepository)
         {
             this.commentRepository = commentRepository;
             this.likeRepository = likeRepository;
             this.postRepository = postRepository;
+            this.userRepository = userRepository;
             this.db = db;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
@@ -61,8 +64,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             // Select both UserName and Id to return to the client
-            var users = await db.ApplicationUsers
-                .Where(u => u.UserName.Contains(query))
+            var users = await db.ApplicationUsers.Where(u => u.UserName.Contains(query))
                 .Select(u => new { u.UserName, u.Id,u.ProfileImageURL }) // Select both UserName and Id
                 .Take(10)
                 .ToListAsync();
