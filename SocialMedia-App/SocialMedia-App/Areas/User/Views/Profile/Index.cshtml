@@ -33,9 +33,9 @@
                 }
                 else
                 {
-                    <form id="followForm">
+                    <form asp-area="User" asp-controller="Profile" asp-action="Follow" method="post">
                         <input type="hidden" name="userId" value="@Model.UserID" />
-                        <button type="submit" class="btn btn-success btn-sm" id="">Follow</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="unfollow_btn">Follow</button>
                     </form>
                 }
             }
