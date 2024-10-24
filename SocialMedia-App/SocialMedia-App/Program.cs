@@ -22,6 +22,7 @@ namespace SocialMedia_App
             builder.Services.AddScoped<ICommentRepository, CommentRepository>();
             builder.Services.AddScoped<ILIkeRepository, LikeRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IFollowerRepository, FollowerRepository>();
             builder.Services.AddRazorPages();
             builder.Services.AddSignalR();
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>
