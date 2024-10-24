@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Data;
+using SocialMedia.Data.Interfaces;
 using SocialMedia.Data.Repository;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
@@ -13,14 +14,14 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly CustomUserManager _customUserManager;
-        private readonly FollowerRepository followerRepository;
-        private readonly PostRepository postRepository;
+        private readonly IFollowerRepository followerRepository;
+        private readonly IPostRepository postRepository;
 
         public ProfileController(UserManager<IdentityUser> userManager,
             CustomUserManager customUserManager,
             SignInManager<IdentityUser> signInManager,
-            FollowerRepository followerRepository,
-            PostRepository postRepository)
+            IFollowerRepository followerRepository,
+            IPostRepository postRepository)
         {
             this.postRepository = postRepository;
             this.followerRepository = followerRepository;
