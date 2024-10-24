@@ -22,6 +22,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly ICommentRepository commentRepository;
         private readonly ILIkeRepository likeRepository;
         private readonly IUserRepository userRepository;
+        
         public HomeController(ApplicationDbContext db,
             IWebHostEnvironment webHostEnvironment,
             UserManager<IdentityUser> userManager,

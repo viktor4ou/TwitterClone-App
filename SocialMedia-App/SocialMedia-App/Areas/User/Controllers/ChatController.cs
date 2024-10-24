@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Data;
+using SocialMedia.Data.Repository;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
 
@@ -12,17 +13,17 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly CustomUserManager customUserManager;
-        private readonly ApplicationDbContext db;
+        private readonly FollowerRepository followerRepository;
 
         public ChatController(UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             CustomUserManager customUserManager,
-            ApplicationDbContext db)
+            FollowerRepository followerRepository)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.customUserManager = customUserManager;
-            this.db = db;
+            this.followerRepository = followerRepository;
         }
 
         [HttpGet]
@@ -43,7 +44,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             //Add repository design pattern
             ChatViewModel chatViewModel = new();
             //it returns list of followers , get the followersId and then get the user details a
-            List<Follower> followers = db.Followers.Where(f => f.FollowOwnerId == userId).ToList();
+            List<Follower> followers = followerRepository.GetAllBy(f => f.FollowOwnerId == userId);
             List<string> userIds = followers.Select(f => f.FollowedUserId).ToList();
             chatViewModel.FollowedUsers = GetAllUsersById(userIds);
 
