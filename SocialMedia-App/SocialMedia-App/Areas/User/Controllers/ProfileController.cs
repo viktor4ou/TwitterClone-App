@@ -114,7 +114,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                 profileVM.ProfilePictureURL = _customUserManager.GetImageURLAsync(user).Result;
                 profileVM.FollowersCount = _customUserManager.GetFollowersCountAsync(user).Result;
                 profileVM.Following = _customUserManager.GetFollowingCountAsync(user).Result;
-                profileVM.Followers = followerRepository.GetAll()
+                profileVM.Followers = followerRepository.GetAll();
                 profileVM.Posts = postRepository.GetAllBy(i => i.PostOwnerId == user.Id);
             }
             return profileVM;
