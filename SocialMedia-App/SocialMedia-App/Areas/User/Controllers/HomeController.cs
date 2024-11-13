@@ -42,7 +42,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             this.signInManager = signInManager;
         }
 
-
+        [HttpGet]
         public IActionResult Index()
         {
             PostViewModel viewModel = GetViewModel();
@@ -216,7 +216,6 @@ namespace SocialMedia_App.Areas.User.Controllers
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
-            //TODO: Add into repo Func for search
             var originalPost = postRepository.GetBy(p => p.PostId == editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)

@@ -88,7 +88,6 @@ namespace SocialMedia_App.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
-            //TODO:add change profile picture functionality
             var user = await _userManager.GetUserAsync(User) as ApplicationUser;
             if (user == null)
             {

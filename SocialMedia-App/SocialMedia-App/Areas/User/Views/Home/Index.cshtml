@@ -25,8 +25,6 @@
             <div class="post-card">
                 <div class="post-header">
                     <div class="d-flex align-items-center">
-                        <!--TODO:Change it to user info-->
-
                         <div class="me-2">
                             <img src="@user.ProfileImageURL" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
                         </div>
@@ -45,7 +43,6 @@
                                 <!--Dropdown with all post manipulations-->
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                     <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="DeletePost" asp-route-id="@post.PostId">Delete</a></li>
-                                    <!--TODO:Add Edit post functionality-->
                                     <li><a class="dropdown-item" asp-area="User" asp-controller="Home" asp-action="EditPost" asp-route-id="@post.PostId">Edit</a></li>
                                 </ul>
                             </div>
