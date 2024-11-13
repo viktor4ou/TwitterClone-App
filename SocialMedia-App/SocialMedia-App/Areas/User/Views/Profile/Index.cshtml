@@ -28,16 +28,17 @@
                 {
                     <form asp-area="User" asp-controller="Profile" asp-action="Unfollow" method="post">
                         <input type="hidden" name="userId" value="@Model.UserID" />
-                        <button type="submit" class="btn btn-danger btn-sm" id="unfollow_btn">Unfollow</button>
+                        <button type="submit" class="btn btn-lg" id="unfollow_btn"><i class="bi bi-person-dash d-flex" style="color: #dc3545; font-size: 1.75rem;"></i></button>
                     </form>
                 }
                 else
                 {
                     <form asp-area="User" asp-controller="Profile" asp-action="Follow" method="post">
                         <input type="hidden" name="userId" value="@Model.UserID" />
-                        <button type="submit" class="btn btn-success btn-sm" id="unfollow_btn">Follow</button>
+                        <button type="submit" class="btn btn-lg" id="unfollow_btn"><i class="bi bi-person-add" style="color:#198754; font-size: 1.75rem;"></i></button>
                     </form>
                 }
+
             }
         </div>
     </div>
