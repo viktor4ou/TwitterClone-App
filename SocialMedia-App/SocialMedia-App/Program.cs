@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
-using Microsoft.AspNetCore.Identity;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Data.Repository;
 using SocialMedia.Models.Hubs;
@@ -13,7 +13,7 @@ namespace SocialMedia_App
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-           
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -25,17 +25,25 @@ namespace SocialMedia_App
             builder.Services.AddScoped<IFollowerRepository, FollowerRepository>();
             builder.Services.AddRazorPages();
             builder.Services.AddSignalR();
-            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
-                {
-                    options.Lockout.AllowedForNewUsers = false; // Disable account lockout
-                    options.User.RequireUniqueEmail = true;
 
-                })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddUserManager<CustomUserManager>();
+
+            builder.Services
+                    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+                    {
+                        options.Lockout.AllowedForNewUsers = false;
+                        options.User.RequireUniqueEmail = true;
+                    })
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
+            builder.Services.AddScoped<CustomUserManager>();
+            builder.Services
+                    .AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
+
+
+
 
             var app = builder.Build();
-                
+
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -44,15 +52,15 @@ namespace SocialMedia_App
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.MapRazorPages();
             app.UseRouting();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseHttpsRedirection();
+            app.MapRazorPages();
             app.UseWebSockets();
             app.MapControllerRoute(
-                name: "default",    
+                name: "default",
                 pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
             app.MapHub<ChatHub>("/chat");
             app.Run();

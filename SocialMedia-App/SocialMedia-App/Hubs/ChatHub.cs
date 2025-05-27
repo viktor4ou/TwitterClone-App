@@ -1,23 +1,17 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using SocialMedia.Models.Models;
 
 namespace SocialMedia.Models.Hubs
 {
     public class ChatHub : Hub
     {
-        private readonly SignInManager<IdentityUser> signInManager;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
         private Dictionary<string, string> Connections;
 
-        public ChatHub(SignInManager<IdentityUser> signInManager,
-            UserManager<IdentityUser> userManager)
+        public ChatHub(SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
@@ -38,7 +32,7 @@ namespace SocialMedia.Models.Hubs
         //{ 
         //    Clients.All.SendAsync("ReceiveMessage", "System", $"{Context.ConnectionId} joined the chat");
         //}
-        public async Task SendPrivateMessage(string userToMessageId, string message)       
+        public async Task SendPrivateMessage(string userToMessageId, string message)
         {
             //The button is going to route the userId that has to be messaged
             //Everytime that someone else if selected for chat , check if there is connection and close if exists

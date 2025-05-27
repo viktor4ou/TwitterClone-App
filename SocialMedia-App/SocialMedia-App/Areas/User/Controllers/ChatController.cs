@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
-using SocialMedia.Data.Repository;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
 
@@ -11,13 +9,13 @@ namespace SocialMedia_App.Areas.User.Controllers
     [Area("User")]
     public class ChatController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly CustomUserManager customUserManager;
         private readonly IFollowerRepository followerRepository;
 
-        public ChatController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+        public ChatController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             CustomUserManager customUserManager,
             IFollowerRepository followerRepository)
         {

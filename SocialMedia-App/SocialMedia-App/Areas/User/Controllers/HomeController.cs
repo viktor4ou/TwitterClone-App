@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using SocialMedia.Data.Data;
-using SocialMedia.Models.Models;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using SocialMedia.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
-using SocialMedia.Data.Repository;
+using SocialMedia.Models.Models;
+using SocialMedia.Models.ViewModels;
+using System.Diagnostics;
 
 namespace SocialMedia_App.Areas.User.Controllers
 {
@@ -16,17 +14,17 @@ namespace SocialMedia_App.Areas.User.Controllers
     {
         private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IPostRepository postRepository;
         private readonly ICommentRepository commentRepository;
         private readonly ILIkeRepository likeRepository;
         private readonly IUserRepository userRepository;
-        
+
         public HomeController(ApplicationDbContext db,
             IWebHostEnvironment webHostEnvironment,
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             IPostRepository postRepository,
             ICommentRepository commentRepository,
             ILIkeRepository likeRepository,
@@ -65,7 +63,7 @@ namespace SocialMedia_App.Areas.User.Controllers
 
             // Select both UserName and Id to return to the client
             var users = await db.ApplicationUsers.Where(u => u.UserName.Contains(query))
-                .Select(u => new { u.UserName, u.Id,u.ProfileImageURL }) // Select both UserName and Id
+                .Select(u => new { u.UserName, u.Id, u.ProfileImageURL }) // Select both UserName and Id
                 .Take(10)
                 .ToListAsync();
 

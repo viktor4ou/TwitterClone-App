@@ -1,7 +1,7 @@
 ﻿@model SocialMedia.Models.ViewModels.ProfileViewModel
 
-@inject SignInManager<IdentityUser> signInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<ApplicationUser> signInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
