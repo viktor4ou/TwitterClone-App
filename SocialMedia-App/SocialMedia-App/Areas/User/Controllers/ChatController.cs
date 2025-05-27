@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
@@ -7,6 +8,7 @@ using SocialMedia.Models.ViewModels;
 namespace SocialMedia_App.Areas.User.Controllers
 {
     [Area("User")]
+    [Authorize]
     public class ChatController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
@@ -26,36 +28,36 @@ namespace SocialMedia_App.Areas.User.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
             if (currentLoggedUser is null)
             {
                 TempData["ErrorMessage"] = "You need to log in to access this feature.";
                 return RedirectToAction("Login", "Account", new { area = "Identity" });
             }
-            ChatViewModel chatViewModel = GetChatViewModel(currentLoggedUser.Id);
+            ChatViewModel chatViewModel = await GetChatViewModel(currentLoggedUser.Id);
             return View(chatViewModel);
         }
 
-        private ChatViewModel GetChatViewModel(string userId)
+        private async Task<ChatViewModel> GetChatViewModel(string userId)
         {
             //Add repository design pattern
             ChatViewModel chatViewModel = new();
             //it returns list of followers , get the followersId and then get the user details a
             List<Follower> followers = followerRepository.GetAllBy(f => f.FollowOwnerId == userId);
             List<string> userIds = followers.Select(f => f.FollowedUserId).ToList();
-            chatViewModel.FollowedUsers = GetAllUsersById(userIds);
+            chatViewModel.FollowedUsers = await GetAllUsersById(userIds);
 
             return chatViewModel;
         }
 
-        private List<ApplicationUser> GetAllUsersById(List<string> userIds)
+        private async Task<List<ApplicationUser>> GetAllUsersById(List<string> userIds)
         {
             List<ApplicationUser> users = new();
             foreach (var userId in userIds)
             {
-                ApplicationUser user = customUserManager.FindByIdAsync(userId).Result as ApplicationUser;
+                ApplicationUser user = await customUserManager.FindByIdAsync(userId);
                 users.Add(user);
             }
             return users;

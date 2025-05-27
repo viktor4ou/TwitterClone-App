@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 namespace SocialMedia_App.Areas.User.Controllers
 {
     [Area("User")]
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -39,9 +41,9 @@ namespace SocialMedia_App.Areas.User.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
         }
-
         [HttpGet]
-        public IActionResult Index()
+        [AllowAnonymous]
+        public async Task<IActionResult> Index()
         {
             PostViewModel viewModel = GetViewModel();
             return View(viewModel);
@@ -50,28 +52,23 @@ namespace SocialMedia_App.Areas.User.Controllers
         [HttpGet]
         public async Task<IActionResult> Search(string query)
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
+
             if (string.IsNullOrWhiteSpace(query))
             {
-                return Json(new List<object>()); // Return an empty list if the query is empty
+                return Json(new List<object>());
             }
 
-            // Select both UserName and Id to return to the client
             var users = await db.ApplicationUsers.Where(u => u.UserName.Contains(query))
-                .Select(u => new { u.UserName, u.Id, u.ProfileImageURL }) // Select both UserName and Id
+                .Select(u => new { u.UserName, u.Id, u.ProfileImageURL })
                 .Take(10)
                 .ToListAsync();
 
-            return Json(users); // Return the list of users as JSON
+            return Json(users);
         }
 
         [HttpPost]
-        public IActionResult CreatePost(PostViewModel postVM, IFormFile? file)
+        public async Task<IActionResult> CreatePost(PostViewModel postVM, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -88,13 +85,7 @@ namespace SocialMedia_App.Areas.User.Controllers
                     postVM.Post.ImageURL = Path.Combine("images", "posts", filename);
                 }
 
-                var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-
-                if (currentLoggedUser is null)
-                {
-                    TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                    return RedirectToAction("Login", "Account", new { area = "Identity" });
-                }
+                var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
                 postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
@@ -110,14 +101,9 @@ namespace SocialMedia_App.Areas.User.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateComment(int postId, PostViewModel postVM)
+        public async Task<IActionResult> CreateComment(int postId, PostViewModel postVM)
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
             postVM.Comment.PostId = postId;
             postVM.Comment.DatePosted = DateTime.Now;
@@ -127,17 +113,11 @@ namespace SocialMedia_App.Areas.User.Controllers
             commentRepository.Save();
 
             return RedirectToAction("Index");
-            //How to make it to just load the comment without refreshing the page like in react
         }
 
-        public IActionResult DeletePost(int id)
+        public async Task<IActionResult> DeletePost(int id)
         {
-            var user = userManager.GetUserAsync(User).Result;
-            if (user is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var user = await userManager.GetUserAsync(User);
 
             Post searchedPost = postRepository.GetPostById(id);
 
@@ -163,14 +143,9 @@ namespace SocialMedia_App.Areas.User.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult DeleteComment(int commentId, int postId)
+        public async Task<IActionResult> DeleteComment(int commentId, int postId)
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
             Comment searchedComment = commentRepository.GetById(commentId);
             Post searchedPost = postRepository.GetPostById(postId);
@@ -186,14 +161,9 @@ namespace SocialMedia_App.Areas.User.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult EditPost(int id)
+        public async Task<IActionResult> EditPost(int id)
         {
-            var currentLoggedUser = userManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await userManager.GetUserAsync(User);
             PostViewModel viewModel = GetViewModel();
             viewModel.Post = postRepository.GetPostById(id);
 
@@ -206,14 +176,9 @@ namespace SocialMedia_App.Areas.User.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditPost(Post editedPost, IFormFile? file)
+        public async Task<IActionResult> EditPost(Post editedPost, IFormFile? file)
         {
-            var currentLoggedUser = userManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await userManager.GetUserAsync(User);
             var originalPost = postRepository.GetBy(p => p.PostId == editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
@@ -257,14 +222,9 @@ namespace SocialMedia_App.Areas.User.Controllers
             return View("EditPost", editedPost);
         }
         [HttpPost]
-        public IActionResult LikePost(int postId)
+        public async Task<IActionResult> LikePost(int postId)
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result;
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
             var post = postRepository.GetPostById(postId);
             var like = likeRepository.GetBy(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);

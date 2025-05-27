@@ -19,7 +19,7 @@ namespace SocialMedia.Models.Hubs
         }
         public async Task SendMessage(string message)
         {
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(Context.User).Result as ApplicationUser;
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(Context.User);
             if (currentLoggedUser is null)
             {
                 throw new Exception("User not found");
@@ -37,7 +37,7 @@ namespace SocialMedia.Models.Hubs
             //The button is going to route the userId that has to be messaged
             //Everytime that someone else if selected for chat , check if there is connection and close if exists
             //When new connection is open we want to load the messages for the userToMessageId and the currentUserId
-            var currentLoggedUser = signInManager.UserManager.GetUserAsync(Context.User).Result as ApplicationUser;
+            var currentLoggedUser = await signInManager.UserManager.GetUserAsync(Context.User);
             string username = currentLoggedUser.FirstName + currentLoggedUser.LastName;
             message = "seks";
             //how can i have new connection when i click on a button

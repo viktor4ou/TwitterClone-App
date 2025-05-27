@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
@@ -39,7 +39,14 @@ namespace SocialMedia_App
             builder.Services
                     .AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
 
-
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                // Use the Identity UI’s login page
+                options.LoginPath = "/Identity/Account/Login";
+                // Optional: if you want a custom access‐denied page
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
 
 
             var app = builder.Build();
@@ -52,11 +59,11 @@ namespace SocialMedia_App
                 app.UseHsts();
             }
 
-            app.UseRouting();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHttpsRedirection();
             app.MapRazorPages();
             app.UseWebSockets();
             app.MapControllerRoute(

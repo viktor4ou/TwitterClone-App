@@ -4,7 +4,7 @@
 @inject UserManager<ApplicationUser> UserManager
 
 @{
-    var currentLoggedUser = signInManager.UserManager.GetUserAsync(User).Result as ApplicationUser;
+    var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 }
 <div class="container my-5">
     <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">

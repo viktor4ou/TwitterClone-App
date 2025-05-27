@@ -19,7 +19,7 @@
     <!--Display all posts-->
     @foreach (var post in @Model.Posts)
     {
-        var user = await UserManager.FindByIdAsync(post.PostOwnerId) as ApplicationUser;
+        var user = await UserManager.FindByIdAsync(post.PostOwnerId);
         var currentUser = await UserManager.GetUserAsync(User);
         <div class="container mt-2">
             <div class="post-card">
@@ -112,8 +112,7 @@
                             <!--Display all comments-->
                             @foreach (var comment in @Model.Comments.Where(c => c.PostId == @post.PostId))
                             {
-                                var commentOwner = SignInManager.UserManager.FindByIdAsync(comment.CommentOwnerId).Result as ApplicationUser;
-
+                                var commentOwner = await UserManager.FindByIdAsync(comment.CommentOwnerId);
                                 <div class="container mt-1">
                                     <div class="row rounded border p-2">
                                         <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
