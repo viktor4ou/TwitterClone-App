@@ -5,6 +5,7 @@ using SocialMedia.Data.Interfaces;
 using SocialMedia.Data.Repository;
 using SocialMedia.Models.Hubs;
 using SocialMedia.Models.Models;
+using SocialMedia_App.Services;
 
 namespace SocialMedia_App
 {
@@ -25,6 +26,7 @@ namespace SocialMedia_App
             builder.Services.AddScoped<IFollowerRepository, FollowerRepository>();
             builder.Services.AddScoped<CustomUserManager>();
             builder.Services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
+            builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailService>();
             builder.Services.AddRazorPages();
             builder.Services.AddSignalR();
 

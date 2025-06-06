@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace SocialMedia.Models.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string?  ProfileImageURL { get; set; }
+        public string? ProfileImageURL { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Followers { get; set; }
-        public int Following { get; set; }  
-
+        public int Following { get; set; }
+        public string Discriminator { get; set; } = nameof(ApplicationUser);
     }
 }
