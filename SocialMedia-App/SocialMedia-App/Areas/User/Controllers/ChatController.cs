@@ -31,21 +31,16 @@ namespace SocialMedia_App.Areas.User.Controllers
         public async Task<IActionResult> Index()
         {
             var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
-            if (currentLoggedUser is null)
-            {
-                TempData["ErrorMessage"] = "You need to log in to access this feature.";
-                return RedirectToAction("Login", "Account", new { area = "Identity" });
-            }
+
             ChatViewModel chatViewModel = await GetChatViewModel(currentLoggedUser.Id);
             return View(chatViewModel);
         }
 
         private async Task<ChatViewModel> GetChatViewModel(string userId)
         {
-            //Add repository design pattern
             ChatViewModel chatViewModel = new();
-            //it returns list of followers , get the followersId and then get the user details a
-            List<Follower> followers = followerRepository.GetAllBy(f => f.FollowOwnerId == userId);
+            //it returns list of followers , get the followersId and then get the user details 
+            List<Follower> followers = await followerRepository.GetFollowersByUserIdAsync(userId);
             List<string> userIds = followers.Select(f => f.FollowedUserId).ToList();
             chatViewModel.FollowedUsers = await GetAllUsersById(userIds);
 

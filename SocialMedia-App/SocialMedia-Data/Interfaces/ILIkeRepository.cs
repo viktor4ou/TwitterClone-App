@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SocialMedia.Models.Models;
+﻿using SocialMedia.Models.Models;
 
 namespace SocialMedia.Data.Interfaces
 {
-    public interface ILIkeRepository: IRepository<Like>
+    public interface ILIkeRepository : IRepository<Like>
     {
+        Task<Like> GetByOwnerAndPostAsync(string ownerId, int postId);
     }
 }

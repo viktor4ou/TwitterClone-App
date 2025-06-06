@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 
@@ -19,9 +13,9 @@ namespace SocialMedia.Data.Repository
             db = dbContext;
             dbSet = db.Set<T>();
         }
-        public void Add(T entity)
+        public async Task AddAsync(T entity)
         {
-            dbSet.Add(entity);
+            await dbSet.AddAsync(entity);
         }
 
         public void Remove(T entity)
@@ -29,27 +23,16 @@ namespace SocialMedia.Data.Repository
             dbSet.Remove(entity);
         }
 
-        public List<T> GetAll()
+        public async Task<List<T>> GetAllAsync()
         {
-            return dbSet.ToList();
+            return await dbSet.ToListAsync();
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         }
 
-        public T GetBy(Expression<Func<T, bool>> expression)
-        {
-            IQueryable<T> query = dbSet;
-            query = query.Where(expression);
-            return query.FirstOrDefault();
-        }
-        public List<T> GetAllBy(Expression<Func<T, bool>> expression)
-        {
-            IQueryable<T> query = dbSet;
-            query = query.Where(expression);
-            return query.ToList();
-        }
+
     }
 }

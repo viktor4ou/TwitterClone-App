@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
@@ -14,7 +12,6 @@ namespace SocialMedia_App.Areas.User.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ApplicationDbContext db;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
@@ -23,7 +20,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         private readonly ILIkeRepository likeRepository;
         private readonly IUserRepository userRepository;
 
-        public HomeController(ApplicationDbContext db,
+        public HomeController(
             IWebHostEnvironment webHostEnvironment,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
@@ -36,7 +33,6 @@ namespace SocialMedia_App.Areas.User.Controllers
             this.likeRepository = likeRepository;
             this.postRepository = postRepository;
             this.userRepository = userRepository;
-            this.db = db;
             this.webHostEnvironment = webHostEnvironment;
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -45,7 +41,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            PostViewModel viewModel = GetViewModel();
+            PostViewModel viewModel = await GetViewModel();
             return View(viewModel);
         }
 
@@ -59,12 +55,9 @@ namespace SocialMedia_App.Areas.User.Controllers
                 return Json(new List<object>());
             }
 
-            var users = await db.ApplicationUsers.Where(u => u.UserName.Contains(query))
-                .Select(u => new { u.UserName, u.Id, u.ProfileImageURL })
-                .Take(10)
-                .ToListAsync();
+            var users = await userRepository.SearchByUsername(query);
 
-            return Json(users);
+            return Json(users.Select(u => new { u.UserName, u.Id, u.ProfileImageURL }));
         }
 
         [HttpPost]
@@ -90,8 +83,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 postVM.Post.PostOwnerId = currentLoggedUser.Id;
                 postVM.Post.DatePosted = DateTime.Now;
 
-                postRepository.Add(postVM.Post);
-                postRepository.Save();
+                await postRepository.AddAsync(postVM.Post);
+                await postRepository.SaveAsync();
 
                 return RedirectToAction("Index");
             }
@@ -109,8 +102,8 @@ namespace SocialMedia_App.Areas.User.Controllers
             postVM.Comment.DatePosted = DateTime.Now;
             postVM.Comment.CommentOwnerId = currentLoggedUser.Id;
 
-            commentRepository.Add(postVM.Comment);
-            commentRepository.Save();
+            await commentRepository.AddAsync(postVM.Comment);
+            await commentRepository.SaveAsync();
 
             return RedirectToAction("Index");
         }
@@ -119,14 +112,14 @@ namespace SocialMedia_App.Areas.User.Controllers
         {
             var user = await userManager.GetUserAsync(User);
 
-            Post searchedPost = postRepository.GetPostById(id);
+            Post searchedPost = await postRepository.GetPostByIdAsync(id);
 
             if (searchedPost == null || searchedPost.PostOwnerId != user.Id)
             {
                 return Unauthorized(); // Return 401 Unauthorized if the user is not the owner
             }
 
-            List<Comment> postComments = commentRepository.GetAllBy(c => c.PostId == id);
+            List<Comment> postComments = await commentRepository.GetCommentsByPostIdAsync(id);
 
             // Delete existing image
             if (searchedPost.ImageURL != null)
@@ -138,7 +131,7 @@ namespace SocialMedia_App.Areas.User.Controllers
 
             postRepository.Remove(searchedPost);
             commentRepository.RemoveRange(postComments);
-            postRepository.Save();
+            await postRepository.SaveAsync();
 
             return RedirectToAction("Index");
         }
@@ -147,8 +140,8 @@ namespace SocialMedia_App.Areas.User.Controllers
         {
             var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
-            Comment searchedComment = commentRepository.GetById(commentId);
-            Post searchedPost = postRepository.GetPostById(postId);
+            Comment searchedComment = await commentRepository.GetByIdAsync(commentId);
+            Post searchedPost = await postRepository.GetPostByIdAsync(postId);
 
             if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && currentLoggedUser.Id != searchedPost.PostOwnerId)
             {
@@ -156,7 +149,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             commentRepository.Remove(searchedComment);
-            commentRepository.Save();
+            await commentRepository.SaveAsync();
 
             return RedirectToAction("Index");
         }
@@ -164,8 +157,8 @@ namespace SocialMedia_App.Areas.User.Controllers
         public async Task<IActionResult> EditPost(int id)
         {
             var currentLoggedUser = await userManager.GetUserAsync(User);
-            PostViewModel viewModel = GetViewModel();
-            viewModel.Post = postRepository.GetPostById(id);
+            PostViewModel viewModel = await GetViewModel();
+            viewModel.Post = await postRepository.GetPostByIdAsync(id);
 
             if (viewModel.Post == null || viewModel.Post.PostOwnerId != currentLoggedUser.Id)
             {
@@ -179,7 +172,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         public async Task<IActionResult> EditPost(Post editedPost, IFormFile? file)
         {
             var currentLoggedUser = await userManager.GetUserAsync(User);
-            var originalPost = postRepository.GetBy(p => p.PostId == editedPost.PostId);
+            var originalPost = await postRepository.GetPostByIdAsync(editedPost.PostId);
 
             if (originalPost == null || originalPost.PostOwnerId != currentLoggedUser.Id)
             {
@@ -208,14 +201,12 @@ namespace SocialMedia_App.Areas.User.Controllers
                         file.CopyTo(s);
                     }
 
-                    editedPost.ImageURL = @"\images\posts\" + filename;
+                    originalPost.ImageURL = @"\images\posts\" + filename;
                 }
+                originalPost.Content = editedPost.Content;
 
-                editedPost.DatePosted = DateTime.Now;
-                editedPost.PostOwnerId = currentLoggedUser.Id;
-
-                postRepository.Update(editedPost);
-                postRepository.Save();
+                postRepository.Update(originalPost);
+                await postRepository.SaveAsync();
 
                 return RedirectToAction("Index");
             }
@@ -226,13 +217,13 @@ namespace SocialMedia_App.Areas.User.Controllers
         {
             var currentLoggedUser = await signInManager.UserManager.GetUserAsync(User);
 
-            var post = postRepository.GetPostById(postId);
-            var like = likeRepository.GetBy(i => i.LikeOwnerId == currentLoggedUser.Id && i.PostId == postId);
+            var post = await postRepository.GetPostByIdAsync(postId);
+            var like = await likeRepository.GetByOwnerAndPostAsync(currentLoggedUser.Id, postId);
 
             if (like == null)
             {
                 like = new Like(postId, currentLoggedUser.Id);
-                likeRepository.Add(like);
+                await likeRepository.AddAsync(like);
                 post.Likes++;
             }
             else
@@ -242,7 +233,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             }
 
             postRepository.Update(post);
-            postRepository.Save();
+            await postRepository.SaveAsync();
 
             return RedirectToAction("Index");
         }
@@ -253,16 +244,16 @@ namespace SocialMedia_App.Areas.User.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private PostViewModel GetViewModel()
+        private async Task<PostViewModel> GetViewModel()
         {
             var viewModel = new PostViewModel
             {
                 Post = new Post(),
-                Posts = postRepository.GetAll(),
+                Posts = await postRepository.GetAllAsync(),
                 Comment = new Comment(),
-                Comments = commentRepository.GetAll(),
+                Comments = await commentRepository.GetAllAsync(),
                 Like = new Like(),
-                Likes = likeRepository.GetAll()
+                Likes = await likeRepository.GetAllAsync()
             };
             foreach (var post in viewModel.Posts)
             {

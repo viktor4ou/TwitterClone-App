@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SocialMedia.Models.Models;
+﻿using SocialMedia.Models.Models;
 
 namespace SocialMedia.Data.Interfaces
 {
-    public  interface IFollowerRepository : IRepository<Follower>
+    public interface IFollowerRepository : IRepository<Follower>
     {
+        public Task<List<Follower>> GetFollowersByUserIdAsync(string userId);
+        public Task<Follower> GetByOwnerAndFollowedAsync(string ownerId, string followedUserId);
+
     }
 }

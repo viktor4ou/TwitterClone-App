@@ -59,8 +59,8 @@ namespace SocialMedia_App.Areas.User.Controllers
 
                 userToFollow.Followers++;
                 currentLoggedUser.Following++;
-                followerRepository.Add(follower);
-                followerRepository.Save();
+                await followerRepository.AddAsync(follower);
+                await followerRepository.SaveAsync();
 
                 return RedirectToAction("Index", new { userId = userId });
             }
@@ -73,9 +73,7 @@ namespace SocialMedia_App.Areas.User.Controllers
         {
             var currentLoggedUser = await _signInManager.UserManager.GetUserAsync(User);
 
-            var followToBeRemoved = followerRepository.GetBy(f =>
-                f.FollowOwnerId == currentLoggedUser.Id &&
-                f.FollowedUserId == userId);
+            var followToBeRemoved = await followerRepository.GetByOwnerAndFollowedAsync(currentLoggedUser.Id, userId);
 
             var userToUnfollow = await _userManager.FindByIdAsync(userId);
 
@@ -86,7 +84,7 @@ namespace SocialMedia_App.Areas.User.Controllers
             currentLoggedUser.Following--;
             userToUnfollow.Followers--;
             followerRepository.Remove(followToBeRemoved);
-            followerRepository.Save();
+            await followerRepository.SaveAsync();
             return RedirectToAction("Index", new { userId = userId });
         }
         private async Task<ProfileViewModel> GetProfileViewModel(string userId)
@@ -102,8 +100,8 @@ namespace SocialMedia_App.Areas.User.Controllers
                 profileVM.ProfilePictureURL = await _customUserManager.GetImageURLAsync(user);
                 profileVM.FollowersCount = await _customUserManager.GetFollowersCountAsync(user);
                 profileVM.Following = await _customUserManager.GetFollowingCountAsync(user);
-                profileVM.Followers = followerRepository.GetAll();
-                profileVM.Posts = postRepository.GetAllBy(i => i.PostOwnerId == user.Id);
+                profileVM.Followers = await followerRepository.GetAllAsync();
+                profileVM.Posts = await postRepository.GetAllPostsByUserId(user.Id);
             }
             return profileVM;
         }

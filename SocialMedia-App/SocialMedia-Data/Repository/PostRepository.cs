@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
@@ -18,9 +14,14 @@ namespace SocialMedia.Data.Repository
             db = dbContext;
         }
 
-        public Post GetPostById(int id)
+        public async Task<List<Post>> GetAllPostsByUserId(string id)
         {
-            return db.Posts.FirstOrDefault(i => i.PostId == id);
+            return await db.Posts.Where(p => p.PostOwnerId == id).ToListAsync();
+        }
+
+        public async Task<Post> GetPostByIdAsync(int id)
+        {
+            return await db.Posts.FirstOrDefaultAsync(i => i.PostId == id);
         }
 
         public void Update(Post entity)

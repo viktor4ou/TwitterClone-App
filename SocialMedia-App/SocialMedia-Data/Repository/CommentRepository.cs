@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
@@ -18,14 +13,19 @@ namespace SocialMedia.Data.Repository
             db = context;
         }
 
-        public Comment GetById(int commentId)
+        public async Task<Comment> GetByIdAsync(int commentId)
         {
-            return dbSet.FirstOrDefault(x=>x.CommentId == commentId);
+            return await dbSet.FirstOrDefaultAsync(x => x.CommentId == commentId);
+        }
+
+        public async Task<List<Comment>> GetCommentsByPostIdAsync(int postId)
+        {
+            return await dbSet.Where(c => c.PostId == postId).ToListAsync();
         }
 
         public void RemoveRange(List<Comment> comments)
         {
             dbSet.RemoveRange(comments);
         }
-    } 
+    }
 }

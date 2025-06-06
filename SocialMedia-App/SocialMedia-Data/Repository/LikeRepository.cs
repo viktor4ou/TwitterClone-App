@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
@@ -16,6 +11,10 @@ namespace SocialMedia.Data.Repository
         public LikeRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
             db = dbContext;
+        }
+        public async Task<Like> GetByOwnerAndPostAsync(string ownerId, int postId)
+        {
+            return await db.Likes.FirstOrDefaultAsync(l => l.LikeOwnerId == ownerId && l.PostId == postId);
         }
     }
 }

@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SocialMedia.Models.Models;
+﻿using SocialMedia.Models.Models;
 
 namespace SocialMedia.Data.Interfaces
 {
-    public interface ICommentRepository: IRepository<Comment>
+    public interface ICommentRepository : IRepository<Comment>
     {
         public void RemoveRange(List<Comment> comments);
-        public Comment GetById(int commentId);
+        public Task<Comment> GetByIdAsync(int commentId);
+        public Task<List<Comment>> GetCommentsByPostIdAsync(int postId);
     }
 }

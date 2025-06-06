@@ -23,9 +23,10 @@ namespace SocialMedia_App
             builder.Services.AddScoped<ILIkeRepository, LikeRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IFollowerRepository, FollowerRepository>();
+            builder.Services.AddScoped<CustomUserManager>();
+            builder.Services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
             builder.Services.AddRazorPages();
             builder.Services.AddSignalR();
-
 
             builder.Services
                     .AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -35,15 +36,10 @@ namespace SocialMedia_App
                     })
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
-            builder.Services.AddScoped<CustomUserManager>();
-            builder.Services
-                    .AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
-                // Use the Identity UI’s login page
                 options.LoginPath = "/Identity/Account/Login";
-                // Optional: if you want a custom access‐denied page
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
@@ -51,11 +47,9 @@ namespace SocialMedia_App
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
