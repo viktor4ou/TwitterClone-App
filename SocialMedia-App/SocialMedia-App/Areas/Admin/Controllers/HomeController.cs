@@ -1,13 +1,14 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using SocialMedia.Data.Data;
 using SocialMedia.Models.Models;
-using Microsoft.AspNetCore.Hosting;
 using SocialMedia.Models.ViewModels;
+using System.Diagnostics;
 
 namespace SocialMedia_App.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -43,7 +44,7 @@ namespace SocialMedia_App.Areas.Admin.Controllers
                         file.CopyTo(s);
                     }
 
-                    postVM.Post.ImageURL = Path.Combine("images","posts",filename);
+                    postVM.Post.ImageURL = Path.Combine("images", "posts", filename);
                 }
 
                 postVM.Post.DatePosted = DateTime.Now;

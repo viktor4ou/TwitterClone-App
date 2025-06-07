@@ -35,6 +35,7 @@ namespace SocialMedia_App
                     {
                         options.Lockout.AllowedForNewUsers = false;
                         options.User.RequireUniqueEmail = true;
+                        options.SignIn.RequireConfirmedAccount = true;
                     })
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
