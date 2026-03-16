@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -23,19 +22,7 @@ namespace SocialMedia.Data.Migrations
                 type: "nvarchar(max)",
                 nullable: true);
 
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "CommentId",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 26, 0, 6, 26, 127, DateTimeKind.Local).AddTicks(1431));
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 26, 0, 6, 26, 127, DateTimeKind.Local).AddTicks(1214));
         }
 
         /// <inheritdoc />
@@ -49,19 +36,7 @@ namespace SocialMedia.Data.Migrations
                 name: "LastName",
                 table: "AspNetUsers");
 
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "CommentId",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 24, 22, 23, 43, 559, DateTimeKind.Local).AddTicks(3494));
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 24, 22, 23, 43, 559, DateTimeKind.Local).AddTicks(3324));
         }
     }
 }

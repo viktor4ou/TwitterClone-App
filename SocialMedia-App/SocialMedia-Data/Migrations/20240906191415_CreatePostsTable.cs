@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -29,14 +28,7 @@ namespace SocialMedia.Data.Migrations
                     table.PrimaryKey("PK_Posts", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Posts",
-                columns: new[] { "Id", "Content", "DatePosted", "ImageURL", "Likes" },
-                values: new object[,]
-                {
-                    { 1, "This is the content of the first post", new DateTime(2024, 9, 6, 22, 14, 13, 892, DateTimeKind.Local).AddTicks(6435), null, 0 },
-                    { 2, "This is the content of the second post", new DateTime(2024, 9, 6, 22, 14, 13, 892, DateTimeKind.Local).AddTicks(6502), null, 0 }
-                });
+
         }
 
         /// <inheritdoc />

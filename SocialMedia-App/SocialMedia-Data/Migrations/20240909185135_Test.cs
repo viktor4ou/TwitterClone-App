@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -34,28 +33,7 @@ namespace SocialMedia.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Comments",
-                columns: new[] { "CommentId", "Content", "DatePosted", "PostId" },
-                values: new object[,]
-                {
-                    { 6, "This is the content of the first comment", new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5579), 6 },
-                    { 7, "This is the content of the second comment", new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5583), 7 }
-                });
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5366));
-
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5432));
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_PostId",
@@ -69,19 +47,7 @@ namespace SocialMedia.Data.Migrations
             migrationBuilder.DropTable(
                 name: "Comments");
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 8, 21, 57, 40, 518, DateTimeKind.Local).AddTicks(9382));
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 8, 21, 57, 40, 518, DateTimeKind.Local).AddTicks(9430));
         }
     }
 }

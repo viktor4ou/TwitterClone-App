@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -49,7 +48,7 @@ namespace SocialMedia.Data.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
-            
+
         }
     }
 }

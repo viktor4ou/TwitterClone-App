@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -27,19 +26,7 @@ namespace SocialMedia.Data.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "CommentId",
-                keyValue: 1,
-                columns: new[] { "CommentOwnerId", "DatePosted" },
-                values: new object[] { "611a46b0-33d0-4609-b43d-f2b47617792b", new DateTime(2024, 9, 30, 21, 23, 40, 964, DateTimeKind.Local).AddTicks(2090) });
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 1,
-                columns: new[] { "DatePosted", "PostOwnerId" },
-                values: new object[] { new DateTime(2024, 9, 30, 21, 23, 40, 964, DateTimeKind.Local).AddTicks(1853), "611a46b0-33d0-4609-b43d-f2b47617792b" });
         }
 
         /// <inheritdoc />
@@ -61,19 +48,7 @@ namespace SocialMedia.Data.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.UpdateData(
-                table: "Comments",
-                keyColumn: "CommentId",
-                keyValue: 1,
-                columns: new[] { "CommentOwnerId", "DatePosted" },
-                values: new object[] { 1, new DateTime(2024, 9, 30, 21, 15, 56, 192, DateTimeKind.Local).AddTicks(9239) });
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 1,
-                columns: new[] { "DatePosted", "PostOwnerId" },
-                values: new object[] { new DateTime(2024, 9, 30, 21, 15, 56, 192, DateTimeKind.Local).AddTicks(9075), 1 });
         }
     }
 }

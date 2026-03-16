@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -191,28 +190,7 @@ namespace SocialMedia.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Comments",
-                columns: new[] { "CommentId", "Content", "DatePosted", "PostId" },
-                values: new object[,]
-                {
-                    { 1, "This is the content of the first comment", new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5129), 1 },
-                    { 2, "This is the content of the second comment", new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5133), 2 }
-                });
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(4979));
-
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "PostId",
-                keyValue: 2,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 23, 18, 31, 44, 802, DateTimeKind.Local).AddTicks(5021));
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -311,28 +289,7 @@ namespace SocialMedia.Data.Migrations
                 oldType: "nvarchar(255)",
                 oldMaxLength: 255);
 
-            migrationBuilder.InsertData(
-                table: "Comments",
-                columns: new[] { "CommentId", "Content", "DatePosted", "PostId" },
-                values: new object[,]
-                {
-                    { 6, "This is the content of the first comment", new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5579), 6 },
-                    { 7, "This is the content of the second comment", new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5583), 7 }
-                });
 
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 1,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5366));
-
-            migrationBuilder.UpdateData(
-                table: "Posts",
-                keyColumn: "Id",
-                keyValue: 2,
-                column: "DatePosted",
-                value: new DateTime(2024, 9, 9, 21, 51, 34, 621, DateTimeKind.Local).AddTicks(5432));
         }
     }
 }

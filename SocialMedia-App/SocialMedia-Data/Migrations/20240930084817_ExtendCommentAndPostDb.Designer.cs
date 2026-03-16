@@ -263,15 +263,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.ToTable("Comments");
 
-                    b.HasData(
-                        new
-                        {
-                            CommentId = 1,
-                            CommentOwnerId = "swgfsdfg",
-                            Content = "First Comment",
-                            DatePosted = new DateTime(2024, 9, 30, 11, 48, 15, 981, DateTimeKind.Local).AddTicks(6510),
-                            PostId = 1
-                        });
+                    
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.Post", b =>
@@ -304,15 +296,7 @@ namespace SocialMedia.Data.Migrations
 
                     b.ToTable("Posts");
 
-                    b.HasData(
-                        new
-                        {
-                            PostId = 1,
-                            Content = "First Post",
-                            DatePosted = new DateTime(2024, 9, 30, 11, 48, 15, 981, DateTimeKind.Local).AddTicks(6208),
-                            Likes = 0,
-                            PostOwnerId = "swgfsdfg"
-                        });
+                   
                 });
 
             modelBuilder.Entity("SocialMedia.Models.Models.ApplicationUser", b =>
