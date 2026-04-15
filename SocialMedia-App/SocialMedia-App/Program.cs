@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
+using Serilog;
+using Serilog.Sinks.PostgreSQL;
 using SocialMedia.Data.Data;
 using SocialMedia.Data.Interfaces;
 using SocialMedia.Data.Repository;
 using SocialMedia.Models.Hubs;
 using SocialMedia.Models.Models;
 using SocialMedia_App.Services;
+using SocialMedia_App.Services.Interfaces;
 
 namespace SocialMedia_App
 {
@@ -14,6 +18,33 @@ namespace SocialMedia_App
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var logsConnectionString = builder.Configuration.GetConnectionString("LogsConnection")!;
+            var columnWriters = new Dictionary<string, ColumnWriterBase>
+            {
+                { "timestamp",       new TimestampColumnWriter(NpgsqlDbType.TimestampTz) },
+                { "level",           new LevelColumnWriter(true, NpgsqlDbType.Varchar) },
+                { "message",         new RenderedMessageColumnWriter(NpgsqlDbType.Text) },
+                { "message_template", new MessageTemplateColumnWriter(NpgsqlDbType.Text) },
+                { "exception",       new ExceptionColumnWriter(NpgsqlDbType.Text) },
+                { "properties",      new PropertiesColumnWriter(NpgsqlDbType.Jsonb) },
+                { "machine_name",    new SinglePropertyColumnWriter("MachineName", PropertyWriteMethod.ToString, NpgsqlDbType.Text) }
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .WriteTo.Console()
+                .WriteTo.PostgreSQL(
+                    connectionString: logsConnectionString,
+                    tableName: "logs",
+                    columnOptions: columnWriters,
+                    needAutoCreateTable: true,
+                    schemaName: "public")
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -26,8 +57,12 @@ namespace SocialMedia_App
             builder.Services.AddScoped<IFollowerRepository, FollowerRepository>();
             builder.Services.AddScoped<CustomUserManager>();
             builder.Services.AddScoped<UserManager<ApplicationUser>, CustomUserManager>();
+            builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IChatService, ChatService>();
             builder.Services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailService>();
             builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
             builder.Services.AddSignalR();
 
             builder.Services
@@ -56,6 +91,7 @@ namespace SocialMedia_App
                 app.UseHsts();
             }
 
+            app.UseSerilogRequestLogging();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -66,8 +102,22 @@ namespace SocialMedia_App
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{area=User}/{controller=Home}/{action=Index}/{id?}");
+            app.MapBlazorHub();
+            app.MapFallbackToPage("/blazor/{*path:nonfile}", "/_Host");
             app.MapHub<ChatHub>("/chat");
-            app.Run();
+
+            try
+            {
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

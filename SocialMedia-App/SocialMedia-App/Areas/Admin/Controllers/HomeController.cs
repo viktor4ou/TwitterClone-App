@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
 using SocialMedia_App.Controllers;
+using SocialMedia_App.Services.Interfaces;
 
 namespace SocialMedia_App.Areas.Admin.Controllers
 {
@@ -11,14 +11,11 @@ namespace SocialMedia_App.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class HomeController : HomeControllerBase
     {
-        public HomeController(IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
+        public HomeController(
             SignInManager<ApplicationUser> signInManager,
-            IPostRepository postRepository,
-            ICommentRepository commentRepository,
-            ILIkeRepository likeRepository,
-            IUserRepository userRepository)
-            : base(webHostEnvironment, userManager, signInManager, postRepository, commentRepository, likeRepository, userRepository)
+            IPostService postService,
+            ILogger<HomeControllerBase> logger)
+            : base(signInManager, postService, logger)
         {
         }
     }

@@ -1,0 +1,300 @@
+@page "/blazor/feed"
+@attribute [AllowAnonymous]
+@inject IPostService PostService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+
+<div>
+    <!-- Main Title -->
+    <div class="container text-center post-card">
+        <h1 class="main-title mb-2">Posts</h1>
+        <div class="title-underline"></div>
+    </div>
+
+    <!-- Create post button -->
+    <AuthorizeView>
+        <Authorized>
+            <div class="container position-relative d-flex justify-content-end">
+                <button type="button" class="btn btn-primary my-2" @onclick="() => showCreateModal = true">
+                    <i class="bi bi-highlighter"></i> Create Post
+                </button>
+            </div>
+        </Authorized>
+    </AuthorizeView>
+
+    <!-- Display all posts -->
+    @if (viewModel != null)
+    {
+        @foreach (var post in viewModel.Posts)
+        {
+            var postUser = users.GetValueOrDefault(post.PostOwnerId);
+            <div class="container mt-2">
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <img src="@ImageHelper.Url(postUser?.ProfileImageURL)" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                            </div>
+                            <div>
+                                <h6 class="mb-0">@postUser?.FirstName @postUser?.LastName</h6>
+                                <small class="text-muted">@post.TimeAgo</small>
+                            </div>
+                            @if (currentUser != null && currentUser.Id == post.PostOwnerId)
+                            {
+                                <div class="dropdown me-2 ms-auto">
+                                    <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><button class="dropdown-item" @onclick="() => DeletePost(post.PostId)">Delete</button></li>
+                                        <li><a class="dropdown-item" href="/User/Home/EditPost/@post.PostId">Edit</a></li>
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>@post.Content</p>
+                        @if (!string.IsNullOrEmpty(post.ImageURL))
+                        {
+                            <img src="@ImageHelper.Url(post.ImageURL)" alt="Post Image" class="img-fluid" />
+                        }
+                    </div>
+                    <div class="post-footer">
+                        <div class="container">
+                            <!-- Like and comment buttons -->
+                            <div class="d-flex align-items-center">
+                                <h6 class="me-2 mb-1">@post.Likes</h6>
+                                @if (currentUser != null)
+                                {
+                                    var isLiked = viewModel.Likes.Any(l => l.PostId == post.PostId && l.LikeOwnerId == currentUser.Id);
+                                    <button class="btn btn-like me-3" @onclick="() => ToggleLike(post.PostId)">
+                                        @if (isLiked)
+                                        {
+                                            <i class="bi bi-heart-fill" style="color: red;"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-heart"></i>
+                                        }
+                                    </button>
+                                    <button class="btn btn-comment" @onclick="() => ToggleCommentForm(post.PostId)">
+                                        <i class="bi bi-chat"></i> Comment
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button disabled class="btn btn-like me-3"><i class="bi bi-heart"></i></button>
+                                    <button disabled class="btn btn-comment"><i class="bi bi-chat"></i> Comment</button>
+                                }
+                            </div>
+
+                            <!-- Comment form -->
+                            @if (currentUser != null && expandedCommentForms.Contains(post.PostId))
+                            {
+                                <div class="mt-2">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Post your answer"
+                                               @bind="commentContents[post.PostId]" @bind:event="oninput" />
+                                        <button class="btn btn-outline-info text-dark d-block" @onclick="() => CreateComment(post.PostId)">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Display comments -->
+                            @foreach (var comment in viewModel.Comments.Where(c => c.PostId == post.PostId))
+                            {
+                                var commentOwner = users.GetValueOrDefault(comment.CommentOwnerId);
+                                <div class="container mt-1">
+                                    <div class="row rounded border p-2">
+                                        <div class="col-md-3 d-flex align-items-center mb-2 mb-md-0">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <img src="@ImageHelper.Url(commentOwner?.ProfileImageURL)" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                                                </div>
+                                                <h6 class="content-wrapper mb-0">@commentOwner?.FirstName @commentOwner?.LastName</h6>
+                                                @if (currentUser != null && (currentUser.Id == comment.CommentOwnerId || currentUser.Id == post.PostOwnerId))
+                                                {
+                                                    <div class="dropdown ms-auto">
+                                                        <button class="btn btn-sm ms-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            <i class="bi bi-three-dots"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><button class="dropdown-item" @onclick="() => DeleteComment(comment.CommentId, post.PostId)">Delete</button></li>
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 py-2 content-wrapper mb-2 mb-md-0">
+                                            @comment.Content
+                                        </div>
+                                        <div class="col-md-3 d-flex align-items-center justify-content-md-end">
+                                            <small class="text-wrap">@comment.TimeAgo</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="container text-center mt-4">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Create Post Modal -->
+@if (showCreateModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Post</h5>
+                    <button type="button" class="btn-close" @onclick="() => showCreateModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control" @bind="newPostContent" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Image</label>
+                        <InputFile OnChange="OnFileSelected" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="() => showCreateModal = false">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="CreatePost">Create Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private PostViewModel? viewModel;
+    private ApplicationUser? currentUser;
+    private Dictionary<string, ApplicationUser> users = new();
+    private bool showCreateModal;
+    private string newPostContent = "";
+    private IBrowserFile? selectedFile;
+    private HashSet<int> expandedCommentForms = new();
+    private Dictionary<int, string> commentContents = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFeed();
+    }
+
+    private async Task LoadFeed()
+    {
+        viewModel = await PostService.GetFeedViewModelAsync();
+
+        // Pre-load all users for posts and comments
+        var userIds = viewModel.Posts.Select(p => p.PostOwnerId)
+            .Union(viewModel.Comments.Select(c => c.CommentOwnerId))
+            .Distinct();
+
+        foreach (var userId in userIds)
+        {
+            if (!users.ContainsKey(userId))
+            {
+                var user = await UserManager.FindByIdAsync(userId);
+                if (user != null)
+                    users[userId] = user;
+            }
+        }
+
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            currentUser = await UserManager.GetUserAsync(authState.User);
+        }
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+
+    private async Task CreatePost()
+    {
+        if (currentUser == null || string.IsNullOrWhiteSpace(newPostContent)) return;
+
+        var post = new Post { Content = newPostContent };
+        Stream? imageStream = null;
+        string? imageExtension = null;
+
+        if (selectedFile != null)
+        {
+            imageStream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            imageExtension = Path.GetExtension(selectedFile.Name);
+        }
+
+        await PostService.CreatePostAsync(currentUser.Id, post, imageStream, imageExtension);
+
+        newPostContent = "";
+        selectedFile = null;
+        showCreateModal = false;
+        await LoadFeed();
+    }
+
+    private async Task ToggleLike(int postId)
+    {
+        if (currentUser == null) return;
+        await PostService.ToggleLikeAsync(currentUser.Id, postId);
+        await LoadFeed();
+    }
+
+    private void ToggleCommentForm(int postId)
+    {
+        if (expandedCommentForms.Contains(postId))
+            expandedCommentForms.Remove(postId);
+        else
+        {
+            expandedCommentForms.Add(postId);
+            if (!commentContents.ContainsKey(postId))
+                commentContents[postId] = "";
+        }
+    }
+
+    private async Task CreateComment(int postId)
+    {
+        if (currentUser == null) return;
+        var content = commentContents.GetValueOrDefault(postId, "");
+        if (string.IsNullOrWhiteSpace(content)) return;
+
+        var comment = new Comment { Content = content };
+        await PostService.CreateCommentAsync(currentUser.Id, postId, comment);
+
+        commentContents[postId] = "";
+        expandedCommentForms.Remove(postId);
+        await LoadFeed();
+    }
+
+    private async Task DeletePost(int postId)
+    {
+        if (currentUser == null) return;
+        await PostService.DeletePostAsync(currentUser.Id, postId);
+        await LoadFeed();
+    }
+
+    private async Task DeleteComment(int commentId, int postId)
+    {
+        if (currentUser == null) return;
+        await PostService.DeleteCommentAsync(currentUser.Id, commentId, postId);
+        await LoadFeed();
+    }
+}

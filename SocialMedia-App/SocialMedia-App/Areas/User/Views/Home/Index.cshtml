@@ -21,7 +21,7 @@
     {
         var user = await UserManager.FindByIdAsync(post.PostOwnerId);
         var currentUser = await UserManager.GetUserAsync(User);
-        <div class="container mt-2">
+        <div class="container mt-2" id="post-@post.PostId">
             <div class="post-card">
                 <div class="post-header">
                     <div class="d-flex align-items-center">

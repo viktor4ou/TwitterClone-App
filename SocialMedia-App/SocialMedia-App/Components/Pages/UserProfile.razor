@@ -1,0 +1,143 @@
+@page "/blazor/profile/{UserId}"
+@attribute [Authorize]
+@inject IProfileService ProfileService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+
+@if (profileVM != null)
+{
+    <div class="container my-5">
+        <!-- Profile Header -->
+        <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
+            <div class="col-auto d-flex align-items-center">
+                <img class="rounded-circle" src="@ImageHelper.Url(profileVM.ProfilePictureURL)" alt="Profile Picture" width="80" height="80">
+            </div>
+            <div class="col">
+                <h4 class="mb-0">@profileVM.FristName @profileVM.LastName</h4>
+                <p class="text-muted mb-0">@@@profileVM.Username</p>
+                <div class="d-block align-content-center">
+                    <p class="text-dark mb-0 d-inline">Followers: @profileVM.FollowersCount</p>
+                    <p class="text-dark mb-0 d-inline ms-3">Following: @profileVM.Following</p>
+                </div>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+                @if (currentUser != null && currentUser.Id != profileVM.UserID)
+                {
+                    @if (profileVM.Followers.Any(f => f.FollowOwnerId == currentUser.Id && f.FollowedUserId == profileVM.UserID))
+                    {
+                        <button class="btn btn-lg" @onclick="Unfollow">
+                            <i class="bi bi-person-dash d-flex" style="color: #dc3545; font-size: 1.75rem;"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-lg" @onclick="Follow">
+                            <i class="bi bi-person-add" style="color:#198754; font-size: 1.75rem;"></i>
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- User Posts -->
+        <div class="row bg-white shadow-sm rounded-3 p-4 mb-4">
+            <div class="col-12">
+                <h3 class="mb-3">My Posts</h3>
+            </div>
+            @foreach (var post in profileVM.Posts.Where(p => p.PostOwnerId == profileVM.UserID))
+            {
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <img src="@ImageHelper.Url(profileVM.ProfilePictureURL)" class="rounded-circle img-thumbnail" style="height: 40px; width: 40px;">
+                            </div>
+                            <div>
+                                <h6 class="mb-0">@profileVM.FristName @profileVM.LastName</h6>
+                                <small class="text-muted">@post.TimeAgo</small>
+                            </div>
+                            @if (currentUser != null && currentUser.Id == profileVM.UserID)
+                            {
+                                <div class="dropdown me-2 ms-auto">
+                                    <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="/User/Home/DeletePost/@post.PostId">Delete</a></li>
+                                        <li><a class="dropdown-item" href="/User/Home/EditPost/@post.PostId">Edit</a></li>
+                                    </ul>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <p>@post.Content</p>
+                        @if (!string.IsNullOrEmpty(post.ImageURL))
+                        {
+                            <img src="@ImageHelper.Url(post.ImageURL)" alt="Post Image" class="img-fluid" />
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (notFound)
+{
+    <div class="container mt-5 text-center">
+        <h3>User not found</h3>
+    </div>
+}
+else
+{
+    <div class="container text-center mt-4">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string UserId { get; set; } = "";
+
+    private ProfileViewModel? profileVM;
+    private ApplicationUser? currentUser;
+    private bool notFound;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProfile();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadProfile();
+    }
+
+    private async Task LoadProfile()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            currentUser = await UserManager.GetUserAsync(authState.User);
+        }
+
+        profileVM = await ProfileService.GetProfileViewModelAsync(UserId);
+        notFound = profileVM == null;
+    }
+
+    private async Task Follow()
+    {
+        if (currentUser == null) return;
+        await ProfileService.FollowAsync(currentUser.Id, UserId);
+        await LoadProfile();
+    }
+
+    private async Task Unfollow()
+    {
+        if (currentUser == null) return;
+        await ProfileService.UnfollowAsync(currentUser.Id, UserId);
+        await LoadProfile();
+    }
+}

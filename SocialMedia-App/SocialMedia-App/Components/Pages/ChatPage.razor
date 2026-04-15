@@ -1,0 +1,132 @@
+@page "/blazor/chat"
+@attribute [Authorize]
+@inject IChatService ChatService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="container-fluid border my-3 vh-100 bg-white">
+    <div class="row h-100">
+        <!-- Contacts List -->
+        <div class="col-md-3 d-md-block border-end">
+            <div class="row">
+                <div class="col-12 p-3 border-bottom">
+                    <h3 class="text-center">Contacts</h3>
+                </div>
+            </div>
+            <div class="list-group list-group-flush chatList">
+                @if (chatVM != null)
+                {
+                    @foreach (var user in chatVM.FollowedUsers)
+                    {
+                        <button class="list-group-item list-group-item-action d-flex align-items-center chat-item @(selectedUser?.Id == user.Id ? "active" : "")"
+                                @onclick="() => SelectUser(user)">
+                            <img src="@ImageHelper.Url(user.ProfileImageURL)" class="avatar-circle bg-secondary rounded-circle me-3" />
+                            <div>
+                                <p class="fw-bold text-break mb-0">@user.FirstName @user.LastName</p>
+                            </div>
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="col-12 col-md-9 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-circle bg-secondary rounded-circle me-3"></div>
+                    <div>
+                        <div class="fw-bold">
+                            @if (selectedUser != null)
+                            {
+                                @selectedUser.FirstName @selectedUser.LastName
+                            }
+                            else
+                            {
+                                <span>Select a contact</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="info-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="flex-grow-1 p-3 overflow-auto chatMessagesList">
+                <div class="container text-success">
+                    @foreach (var message in messages)
+                    {
+                        <div class="mb-2">
+                            <strong>@message.Sender:</strong> @message.Content
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="input-group p-3 border-top">
+                <input type="text" class="form-control" placeholder="Enter a message"
+                       @bind="messageInput" @onkeypress="HandleKeyPress" disabled="@(selectedUser == null)" />
+                <button class="btn btn-primary" type="button" @onclick="SendMessage" disabled="@(selectedUser == null)">
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ChatViewModel? chatVM;
+    private ApplicationUser? currentUser;
+    private ApplicationUser? selectedUser;
+    private string messageInput = "";
+    private List<ChatMessage> messages = new();
+
+    private record ChatMessage(string Sender, string Content);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            currentUser = await UserManager.GetUserAsync(authState.User);
+        }
+
+        if (currentUser != null)
+        {
+            chatVM = await ChatService.GetChatViewModelAsync(currentUser.Id);
+        }
+    }
+
+    private void SelectUser(ApplicationUser user)
+    {
+        selectedUser = user;
+        messages.Clear();
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(messageInput) || currentUser == null || selectedUser == null)
+            return;
+
+        messages.Add(new ChatMessage(currentUser.FirstName, messageInput));
+        messageInput = "";
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendMessage();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+    }
+}

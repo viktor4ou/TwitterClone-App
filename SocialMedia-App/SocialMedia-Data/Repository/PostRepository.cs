@@ -24,6 +24,17 @@ namespace SocialMedia.Data.Repository
             return await db.Posts.FirstOrDefaultAsync(i => i.PostId == id);
         }
 
+        public async Task<List<Post>> SearchByContentAsync(string query, int take = 5)
+        {
+            var normalizedQuery = query.Trim().ToLower();
+
+            return await db.Posts
+                .Where(p => p.Content.ToLower().Contains(normalizedQuery))
+                .OrderByDescending(p => p.DatePosted)
+                .Take(take)
+                .ToListAsync();
+        }
+
         public void Update(Post entity)
         {
             db.Posts.Update(entity);

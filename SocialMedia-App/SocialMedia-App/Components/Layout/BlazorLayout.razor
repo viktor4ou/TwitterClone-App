@@ -1,0 +1,87 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserManager<ApplicationUser> UserManager
+
+<header>
+    <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container-fluid">
+            <img src="/images/icon.png" width="40" height="40" />
+            <a class="navbar-brand ms-1" href="/blazor/feed">EchoSocial</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#blazorNavbar"
+                    aria-controls="blazorNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between" id="blazorNavbar">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="/blazor/feed">Home</a>
+                    </li>
+                    <AuthorizeView>
+                        <Authorized>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/blazor/chat">Chat</a>
+                            </li>
+                        </Authorized>
+                    </AuthorizeView>
+                </ul>
+
+                <ul class="navbar-nav">
+                    <AuthorizeView>
+                        <Authorized>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/blazor/profile/@currentUserId">Profile</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Identity/Account/Manage/Index">Manage</a>
+                            </li>
+                            <li class="nav-item">
+                                <form method="post" action="/Identity/Account/Logout">
+                                    <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                                </form>
+                            </li>
+                        </Authorized>
+                        <NotAuthorized>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Identity/Account/Register">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Identity/Account/Login">Login</a>
+                            </li>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                    <li class="nav-item">
+                        <a class="nav-link text-muted" href="/User/Home/Index">Switch to MVC</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="container">
+    <main role="main" class="pb-3">
+        @Body
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2026 - EchoSocial
+    </div>
+</footer>
+
+@code {
+    private string? currentUserId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var user = await UserManager.GetUserAsync(authState.User);
+            currentUserId = user?.Id;
+        }
+    }
+}

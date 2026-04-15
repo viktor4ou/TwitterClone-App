@@ -1,106 +1,57 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
-using SocialMedia.Models.ViewModels;
+using SocialMedia_App.Services;
+using SocialMedia_App.Services.Interfaces;
 
 namespace SocialMedia_App.Controllers
 {
     public abstract class ProfileControllerBase : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly CustomUserManager _customUserManager;
-        private readonly IFollowerRepository followerRepository;
-        private readonly IPostRepository postRepository;
+        private readonly IProfileService _profileService;
+        private readonly ILogger<ProfileControllerBase> _logger;
 
-        protected ProfileControllerBase(UserManager<ApplicationUser> userManager,
-            CustomUserManager customUserManager,
+        protected ProfileControllerBase(
             SignInManager<ApplicationUser> signInManager,
-            IFollowerRepository followerRepository,
-            IPostRepository postRepository)
+            IProfileService profileService,
+            ILogger<ProfileControllerBase> logger)
         {
-            this.postRepository = postRepository;
-            this.followerRepository = followerRepository;
-            _userManager = userManager;
-            _customUserManager = customUserManager;
             _signInManager = signInManager;
+            _profileService = profileService;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index(string userId)
         {
-            var searchedUser = await _userManager.FindByIdAsync(userId);
-            if (searchedUser is null)
-            {
-                return BadRequest();
-            }
-            ProfileViewModel profileVM = await GetProfileViewModel(userId);
+            var profileVM = await _profileService.GetProfileViewModelAsync(userId);
+            if (profileVM == null) return BadRequest();
             return View(profileVM);
         }
 
         [HttpPost]
         public async Task<IActionResult> Follow(string userId)
         {
-            var currentLoggedUser = await _signInManager.UserManager.GetUserAsync(User);
-            var userToFollow = await _userManager.FindByIdAsync(userId);
+            var currentUser = await _signInManager.UserManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
 
-            if (userToFollow != null)
-            {
-                Follower follower = new()
-                {
-                    FollowerId = Guid.NewGuid().ToString(),
-                    FollowOwnerId = currentLoggedUser.Id,
-                    FollowedUserId = userToFollow.Id
-                };
+            var success = await _profileService.FollowAsync(currentUser.Id, userId);
+            if (!success) return Unauthorized();
 
-                userToFollow.Followers++;
-                currentLoggedUser.Following++;
-                await followerRepository.AddAsync(follower);
-                await followerRepository.SaveAsync();
-
-                return RedirectToAction("Index", new { userId = userId });
-            }
-
-            return Unauthorized();
+            return RedirectToAction("Index", new { userId });
         }
 
         [HttpPost]
         public async Task<IActionResult> Unfollow(string userId)
         {
-            var currentLoggedUser = await _signInManager.UserManager.GetUserAsync(User);
+            var currentUser = await _signInManager.UserManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
 
-            var followToBeRemoved = await followerRepository.GetByOwnerAndFollowedAsync(currentLoggedUser.Id, userId);
+            var result = await _profileService.UnfollowAsync(currentUser.Id, userId);
+            if (result == OperationResult.BadRequest) return BadRequest();
 
-            var userToUnfollow = await _userManager.FindByIdAsync(userId);
-
-            if (followToBeRemoved is null)
-            {
-                return BadRequest();
-            }
-            currentLoggedUser.Following--;
-            userToUnfollow.Followers--;
-            followerRepository.Remove(followToBeRemoved);
-            await followerRepository.SaveAsync();
-            return RedirectToAction("Index", new { userId = userId });
-        }
-        private async Task<ProfileViewModel> GetProfileViewModel(string userId)
-        {
-            ProfileViewModel profileVM = new();
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
-            {
-                profileVM.UserID = user.Id;
-                profileVM.Username = user.UserName;
-                profileVM.FristName = await _customUserManager.GetFirstNameAsync(user);
-                profileVM.LastName = await _customUserManager.GetLastNameAsync(user);
-                profileVM.ProfilePictureURL = await _customUserManager.GetImageURLAsync(user);
-                profileVM.FollowersCount = await _customUserManager.GetFollowersCountAsync(user);
-                profileVM.Following = await _customUserManager.GetFollowingCountAsync(user);
-                profileVM.Followers = await followerRepository.GetAllAsync();
-                profileVM.Posts = await postRepository.GetAllPostsByUserId(user.Id);
-            }
-            return profileVM;
+            return RedirectToAction("Index", new { userId });
         }
     }
 }

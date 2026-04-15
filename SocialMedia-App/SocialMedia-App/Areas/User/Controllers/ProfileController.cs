@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
 using SocialMedia_App.Controllers;
+using SocialMedia_App.Services.Interfaces;
 
 namespace SocialMedia_App.Areas.User.Controllers
 {
@@ -11,12 +11,11 @@ namespace SocialMedia_App.Areas.User.Controllers
     [Authorize]
     public class ProfileController : ProfileControllerBase
     {
-        public ProfileController(UserManager<ApplicationUser> userManager,
-            CustomUserManager customUserManager,
+        public ProfileController(
             SignInManager<ApplicationUser> signInManager,
-            IFollowerRepository followerRepository,
-            IPostRepository postRepository)
-            : base(userManager, customUserManager, signInManager, followerRepository, postRepository)
+            IProfileService profileService,
+            ILogger<ProfileControllerBase> logger)
+            : base(signInManager, profileService, logger)
         {
         }
     }

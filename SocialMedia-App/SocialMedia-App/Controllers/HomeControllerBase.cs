@@ -1,56 +1,48 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.Data.Interfaces;
 using SocialMedia.Models.Models;
 using SocialMedia.Models.ViewModels;
+using SocialMedia_App.Services;
+using SocialMedia_App.Services.Interfaces;
 using System.Diagnostics;
+
 namespace SocialMedia_App.Controllers
 {
     [Authorize]
     public abstract class HomeControllerBase : Controller
     {
-        private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly IPostRepository postRepository;
-        private readonly ICommentRepository commentRepository;
-        private readonly ILIkeRepository likeRepository;
-        private readonly IUserRepository userRepository;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IPostService _postService;
+        private readonly ILogger<HomeControllerBase> _logger;
 
         protected HomeControllerBase(
-            IWebHostEnvironment webHostEnvironment,
-            UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IPostRepository postRepository,
-            ICommentRepository commentRepository,
-            ILIkeRepository likeRepository,
-            IUserRepository userRepository)
+            IPostService postService,
+            ILogger<HomeControllerBase> logger)
         {
-            this.commentRepository = commentRepository;
-            this.likeRepository = likeRepository;
-            this.postRepository = postRepository;
-            this.userRepository = userRepository;
-            this.webHostEnvironment = webHostEnvironment;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+            _signInManager = signInManager;
+            _postService = postService;
+            _logger = logger;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            PostViewModel viewModel = await GetViewModel();
+            _logger.LogInformation("Feed loaded by {User}", User.Identity?.Name ?? "anonymous");
+            PostViewModel viewModel = await _postService.GetFeedViewModelAsync();
             return View(viewModel);
         }
 
         [HttpGet]
         public async Task<IActionResult> Search(string query)
         {
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: true);
+            var currentUser = await GetCurrentUserAsync();
 
-            if (currentLoggedUser == null)
+            if (currentUser == null)
             {
+                _logger.LogWarning("Unauthenticated search attempt for query '{Query}'", query);
                 return Unauthorized();
             }
 
@@ -59,9 +51,9 @@ namespace SocialMedia_App.Controllers
                 return Json(new List<object>());
             }
 
-            var users = await userRepository.SearchByUsername(query);
-
-            return Json(users.Select(u => new { u.UserName, u.Id, u.ProfileImageURL }));
+            _logger.LogInformation("User {UserId} searched for '{Query}'", currentUser.Id, query);
+            var results = await _postService.SearchAsync(query);
+            return Json(results);
         }
 
         [HttpPost]
@@ -69,83 +61,45 @@ namespace SocialMedia_App.Controllers
         {
             if (ModelState.IsValid)
             {
-                var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: true);
+                var currentUser = await GetCurrentUserAsync();
 
-                if (currentLoggedUser == null)
+                if (currentUser == null)
                 {
+                    _logger.LogWarning("Unauthenticated attempt to create a post");
                     return Unauthorized();
                 }
 
-                if (file != null)
-                {
-                    string wwwRootPath = webHostEnvironment.WebRootPath;
-                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, "images", "posts");
-
-                    using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
-                    {
-                        file.CopyTo(s);
-                    }
-                    postVM.Post.ImageURL = Path.Combine("images", "posts", filename);
-                }
-
-                postVM.Post.PostOwnerId = currentLoggedUser.Id;
-                postVM.Post.DatePosted = DateTime.Now;
-
-                await postRepository.AddAsync(postVM.Post);
-                await postRepository.SaveAsync();
-
+                Stream? imageStream = file?.OpenReadStream();
+                string? imageExtension = file != null ? Path.GetExtension(file.FileName) : null;
+                await _postService.CreatePostAsync(currentUser.Id, postVM.Post, imageStream, imageExtension);
                 return RedirectToAction("Index");
             }
             ViewData["ShowModal"] = true;
-
             return View("Index", postVM);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateComment(int postId, PostViewModel postVM)
         {
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: true);
+            var currentUser = await GetCurrentUserAsync();
 
-            if (currentLoggedUser == null)
+            if (currentUser == null)
             {
+                _logger.LogWarning("Unauthenticated attempt to comment on post {PostId}", postId);
                 return Unauthorized();
             }
 
-            postVM.Comment.PostId = postId;
-            postVM.Comment.DatePosted = DateTime.Now;
-            postVM.Comment.CommentOwnerId = currentLoggedUser.Id;
-
-            await commentRepository.AddAsync(postVM.Comment);
-            await commentRepository.SaveAsync();
-
+            await _postService.CreateCommentAsync(currentUser.Id, postId, postVM.Comment);
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> DeletePost(int id)
         {
-            var user = await GetCurrentLoggedUserAsync(useSignInManager: false);
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
 
-            Post searchedPost = await postRepository.GetPostByIdAsync(id);
-
-            if (searchedPost == null || user == null || searchedPost.PostOwnerId != user.Id)
-            {
-                return Unauthorized();
-            }
-
-            List<Comment> postComments = await commentRepository.GetCommentsByPostIdAsync(id);
-
-            // Delete existing image
-            if (searchedPost.ImageURL != null)
-            {
-                string wwwRootPath = webHostEnvironment.WebRootPath;
-                string imageFullPath = Path.Combine(wwwRootPath, searchedPost.ImageURL.TrimStart('\\'));
-                System.IO.File.Delete(imageFullPath);
-            }
-
-            postRepository.Remove(searchedPost);
-            commentRepository.RemoveRange(postComments);
-            await postRepository.SaveAsync();
+            var result = await _postService.DeletePostAsync(currentUser.Id, id);
+            if (result != OperationResult.Success) return Unauthorized();
 
             return RedirectToAction("Index");
         }
@@ -157,35 +111,23 @@ namespace SocialMedia_App.Controllers
                 return BadRequest("Comment ID and Post ID must be greater than zero.");
             }
 
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: true);
+            var currentUser = await GetCurrentUserAsync();
 
-            if (currentLoggedUser == null)
+            if (currentUser == null)
             {
+                _logger.LogWarning("Unauthenticated attempt to delete comment {CommentId}", commentId);
                 return Unauthorized();
             }
 
-            Comment searchedComment = await commentRepository.GetByIdAsync(commentId);
-            Post searchedPost = await postRepository.GetPostByIdAsync(postId);
-
-            if (searchedComment == null || searchedPost == null)
+            var result = await _postService.DeleteCommentAsync(currentUser.Id, commentId, postId);
+            return result switch
             {
-                return NotFound("Comment or Post not found.");
-            }
-
-            if (searchedComment.PostId != postId)
-            {
-                return BadRequest("Comment does not belong to the specified post.");
-            }
-
-            if ((searchedComment.CommentOwnerId != currentLoggedUser.Id) && (currentLoggedUser.Id != searchedPost.PostOwnerId))
-            {
-                return Unauthorized();
-            }
-
-            commentRepository.Remove(searchedComment);
-            await commentRepository.SaveAsync();
-
-            return RedirectToAction("Index");
+                OperationResult.Success => RedirectToAction("Index"),
+                OperationResult.NotFound => NotFound("Comment or Post not found."),
+                OperationResult.BadRequest => BadRequest("Comment does not belong to the specified post."),
+                OperationResult.Unauthorized => Unauthorized(),
+                _ => BadRequest()
+            };
         }
 
         public async Task<IActionResult> EditPost(int id)
@@ -195,28 +137,13 @@ namespace SocialMedia_App.Controllers
                 return BadRequest("Post ID must be greater than zero.");
             }
 
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: false);
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
 
-            if (currentLoggedUser == null)
-            {
-                return Unauthorized();
-            }
+            var post = await _postService.GetPostForEditAsync(currentUser.Id, id);
+            if (post == null) return NotFound("Post not found.");
 
-            PostViewModel viewModel = await GetViewModel();
-            viewModel.Post = await postRepository.GetPostByIdAsync(id);
-
-            if (viewModel.Post == null)
-            {
-                return NotFound("Post not found.");
-            }
-
-            // Validate authorization: User must be the post owner
-            if (viewModel.Post.PostOwnerId != currentLoggedUser.Id)
-            {
-                return Unauthorized();
-            }
-
-            return View(viewModel.Post);
+            return View(post);
         }
 
         [HttpPost]
@@ -232,24 +159,8 @@ namespace SocialMedia_App.Controllers
                 return BadRequest("Post ID must be greater than zero.");
             }
 
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: false);
-
-            if (currentLoggedUser == null)
-            {
-                return Unauthorized();
-            }
-
-            var originalPost = await postRepository.GetPostByIdAsync(editedPost.PostId);
-
-            if (originalPost == null)
-            {
-                return NotFound("Post not found.");
-            }
-
-            if (originalPost.PostOwnerId != currentLoggedUser.Id)
-            {
-                return Unauthorized();
-            }
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
 
             if (ModelState.IsValid)
             {
@@ -259,54 +170,26 @@ namespace SocialMedia_App.Controllers
                     return View("EditPost", editedPost);
                 }
 
-                // Uploaded a new image
-                if (file != null)
+                if (file != null && file.Length == 0)
                 {
-                    if (file.Length == 0)
-                    {
-                        ModelState.AddModelError("file", "Please select a file to upload.");
-                        return View("EditPost", editedPost);
-                    }
-
-                    string wwwRootPath = webHostEnvironment.WebRootPath;
-                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, "images", "posts");
-
-                    // Delete existing image
-                    if (originalPost.ImageURL != null)
-                    {
-                        string oldImagePath = Path.Combine(wwwRootPath, originalPost.ImageURL.TrimStart('\\'));
-                        try
-                        {
-                            if (System.IO.File.Exists(oldImagePath))
-                            {
-                                System.IO.File.Delete(oldImagePath);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            // Log or handle file deletion error, but continue
-                            System.Diagnostics.Debug.WriteLine($"Error deleting old image: {ex.Message}");
-                        }
-                    }
-
-                    // Save new image
-                    using (FileStream s = new FileStream(Path.Combine(productPath, filename), FileMode.Create))
-                    {
-                        file.CopyTo(s);
-                    }
-
-                    originalPost.ImageURL = @"\images\posts\" + filename;
+                    ModelState.AddModelError("file", "Please select a file to upload.");
+                    return View("EditPost", editedPost);
                 }
-                originalPost.Content = editedPost.Content;
 
-                postRepository.Update(originalPost);
-                await postRepository.SaveAsync();
+                Stream? imageStream = file?.OpenReadStream();
+                string? imageExtension = file != null ? Path.GetExtension(file.FileName) : null;
 
-                return RedirectToAction("Index");
+                var result = await _postService.EditPostAsync(currentUser.Id, editedPost.PostId, editedPost.Content, imageStream, imageExtension);
+                return result switch
+                {
+                    OperationResult.Success => RedirectToAction("Index"),
+                    OperationResult.NotFound => NotFound("Post not found."),
+                    _ => Unauthorized()
+                };
             }
             return View("EditPost", editedPost);
         }
+
         [HttpPost]
         public async Task<IActionResult> LikePost(int postId)
         {
@@ -315,36 +198,11 @@ namespace SocialMedia_App.Controllers
                 return BadRequest("Post ID must be greater than zero.");
             }
 
-            var currentLoggedUser = await GetCurrentLoggedUserAsync(useSignInManager: true);
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser == null) return Unauthorized();
 
-            if (currentLoggedUser == null)
-            {
-                return Unauthorized();
-            }
-
-            var post = await postRepository.GetPostByIdAsync(postId);
-
-            if (post == null)
-            {
-                return NotFound("Post not found.");
-            }
-
-            var like = await likeRepository.GetByOwnerAndPostAsync(currentLoggedUser.Id, postId);
-
-            if (like == null)
-            {
-                like = new Like(postId, currentLoggedUser.Id);
-                await likeRepository.AddAsync(like);
-                post.Likes++;
-            }
-            else
-            {
-                likeRepository.Remove(like);
-                post.Likes--;
-            }
-
-            postRepository.Update(post);
-            await postRepository.SaveAsync();
+            var result = await _postService.ToggleLikeAsync(currentUser.Id, postId);
+            if (result == OperationResult.NotFound) return NotFound("Post not found.");
 
             return RedirectToAction("Index");
         }
@@ -354,50 +212,10 @@ namespace SocialMedia_App.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-        private async Task<ApplicationUser?> GetCurrentLoggedUserAsync(bool useSignInManager = true)
+
+        private async Task<ApplicationUser?> GetCurrentUserAsync()
         {
-            ApplicationUser? currentUser = useSignInManager
-                ? await signInManager.UserManager.GetUserAsync(User)
-                : await userManager.GetUserAsync(User);
-
-            return currentUser;
-        }
-
-        private async Task<PostViewModel> GetViewModel()
-        {
-            var viewModel = new PostViewModel
-            {
-                Post = new Post(),
-                Posts = await postRepository.GetAllAsync(),
-                Comment = new Comment(),
-                Comments = await commentRepository.GetAllAsync(),
-                Like = new Like(),
-                Likes = await likeRepository.GetAllAsync()
-            };
-            foreach (var post in viewModel.Posts)
-            {
-                post.TimeAgo = TimeAgo(post.DatePosted);
-            }
-            foreach (var comment in viewModel.Comments)
-            {
-                comment.TimeAgo = TimeAgo(comment.DatePosted);
-            }
-
-            return viewModel;
-        }
-        private string TimeAgo(DateTime postedDate)
-        {
-            var timeSpan = DateTime.Now - postedDate;
-
-            return timeSpan switch
-            {
-                _ when timeSpan <= TimeSpan.FromSeconds(60) => "Just now",
-                _ when timeSpan <= TimeSpan.FromMinutes(60) => $"{timeSpan.Minutes} minutes ago",
-                _ when timeSpan <= TimeSpan.FromHours(24) => $"{timeSpan.Hours} hours ago",
-                _ when timeSpan <= TimeSpan.FromDays(7) => $"{timeSpan.Days} days ago",
-                _ when timeSpan <= TimeSpan.FromDays(30) => $"{timeSpan.Days / 7} weeks ago",
-                _ => postedDate.ToString("MMMM dd, yyyy")
-            };
+            return await _signInManager.UserManager.GetUserAsync(User);
         }
     }
 }
